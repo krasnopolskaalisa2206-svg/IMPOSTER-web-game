@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Дек 19 2025 г., 19:52
+-- Время создания: Дек 22 2025 г., 23:17
 -- Версия сервера: 10.4.32-MariaDB
 -- Версия PHP: 8.2.12
 
@@ -76,6 +76,28 @@ INSERT INTO `categories` (`category_id`, `category_title`) VALUES
 (37, 'Dimensions'),
 (38, 'Adjectives: personality, description, feelings'),
 (39, 'Hobbies and lifestyles');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `players`
+--
+
+CREATE TABLE `players` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Дамп данных таблицы `players`
+--
+
+INSERT INTO `players` (`id`, `username`, `password`) VALUES
+(1, 'username', 'passwprkd'),
+(2, 'user', 'test'),
+(3, 'CoolName', 'password'),
+(4, 'AnotherCoolName', '$2y$10$zaggPY5nVBVBJ95q/Cri1ec83EoIzhggWbfYMlJycmT88PfMbDSC6');
 
 -- --------------------------------------------------------
 
@@ -424675,6 +424697,14 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
+-- Индексы таблицы `players`
+--
+ALTER TABLE `players`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username_2` (`username`),
+  ADD KEY `username` (`username`);
+
+--
 -- Индексы таблицы `pos_tags`
 --
 ALTER TABLE `pos_tags`
@@ -424702,6 +424732,16 @@ ALTER TABLE `word_pos`
   ADD PRIMARY KEY (`word_pos_id`),
   ADD KEY `word_id` (`word_id`),
   ADD KEY `pos_tag_id` (`pos_tag_id`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `players`
+--
+ALTER TABLE `players`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
