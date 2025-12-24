@@ -5,7 +5,6 @@
     $uri = $_SERVER["REQUEST_URI"];
     $uri_array = explode("/", $uri);
     $_SESSION['redirect'] = $uri_array[count($uri_array) - 1];
-    echo $_SESSION['redirect'];
 ?>
 <!DOCTYPE html>
 <html lang="en">

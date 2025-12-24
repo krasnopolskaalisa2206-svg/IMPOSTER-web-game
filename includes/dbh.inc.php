@@ -3,7 +3,6 @@
     /**
      * Script Log
      * 18.12.2025: Artem:  Implemented connection handler and word allocation function
-     *             To-dos: Create a white list with all WHERE clauses (consider it "system queries") 
      *                     
      * 
      * 19.12.2025: Artem:  Refactored the word allocation function
@@ -24,6 +23,7 @@
     function withConnection(callable $callback){
         
         // These are placeholder values for LOCAL TESTING
+        // Create a CONFIG file
         $db_servername = "localhost";
         $db_username = "root";
         $db_password = "";
@@ -74,7 +74,6 @@
                     if(in_array($attribute_name, $column_names)){
                         $sql_add = $sql_add . $attribute_name . ", ";  
                     } else {
-                        echo "$attribute_name is not in the array";
                         throw new Exception("White list exception.");
                     }
                 }
@@ -132,9 +131,10 @@
                 } catch(Exception $e){
                     echo "SQL Statement Execution exception" . $e->getMessage();
                 }
+                return true;
             } catch(Exception $e){
                 echo "Error " . $e->getMessage();
-                exit();
+                return false;
         }
     }
     function updateFunction($connection){
@@ -219,59 +219,5 @@
             echo "Error with attribute retreival " . $e->getMessage();
             return false;
         }
-    }
-    function wordAllocation(){
-        withConnection(function($connection){
-            $valid_word = false;
-            $attempt_count = 0;
-            while(!$valid_word){
-                if($attempt_count >= 10){
-                    return false;
-                }
-                try{
-                    $result = selectFunction($connection, "*", "categories", "", "1=1 ORDER BY RAND() LIMIT 1");
-
-                    // if the query failed (ret false) or no results found 
-                    if (!$result || mysqli_num_rows($result) <= 0){
-                        continue;
-                    }
-                    // get results
-                    $row = mysqli_fetch_assoc($result);
-                    $cat_id = $row['category_id'];
-                    $title = $row['category_title'];
-                } catch(Exception $e){
-                    echo "Error" . $e->getMessage();
-                    exit();
-                }
-                
-                // fetching a word
-                try{
-                    // there is a pt.tag_id which signifies which point of speech word we are using
-                    // Currently it is just set up to noun, which may be a limitation
-                    // work on range
-                    $parameters = array($cat_id, 4, 13);
-                    $result = selectFunction($connection, "*", "words w", "JOIN word_pos wp ON w.word_id = wp.word_id 
-                                                        JOIN word_categories wc ON wp.word_pos_id = wc.word_pos_id 
-                                                        JOIN pos_tags pt ON wp.pos_tag_id = pt.tag_id
-                                                        JOIN categories c ON wc.category_id = c.category_id", "c.category_id = ? AND wp.level < ? AND pt.tag_id = ?", $parameters);
-                    // if the result was not found
-                    if (!$result || mysqli_num_rows($result) <= 0){
-                        $attempt_count++;
-                        continue;
-                    }
-                    $valid_word = true;
-                } catch(Exception $e){
-                    $attempt_count++;
-                    continue;
-                }
-            }
-            if ($valid_word && $result) {
-                $row = mysqli_fetch_assoc($result);
-                $word_id = $row['word_id'];
-                $word = $row['word'];
-            } else {
-                echo "No valid word found.";
-            }
-        });
     }
 ?>

@@ -1,24 +1,19 @@
 <?php
-    /** 
-     * Script Log: 
-     * 19.12.2025: Artem: Implemented user crearion
-     * 
-     * 24.12.2025: Artem: changed validation settings
-     * 
-    */
+    require_once "user.validation.inc.php";
 
     session_start();
-    require_once "user.validation.inc.php";
     if(isset($_POST["submit"])){
 
+        // Validate
+        // Insert or not
         $username = $_POST["username"]; 
         $password = $_POST["password"];
 
         // if the validation was not passed or if the username exists we redirect
-        if (!formValidation($username, $password) || uidValidationUser($username)){
-            Redirect();
+        if (!formValidation($username, $password) || !passwordValidationUser($username, $password)){
+            // Redirect();
         } else {
-            insertUser($username, $password);
+            header("Location: ../main-menu.php");
             }
     } else {
         Redirect();
