@@ -1,6 +1,17 @@
 <?php
     require_once "dbh.inc.php";
     
+    function roomGeneration($room_name){
+        return withConnection(function($connection) use ($room_name){
+            $parameters = array($room_name);
+            if(insertFunction($connection, "rooms", [], $parameters)){
+                return true;
+            } else{
+                return false;
+            }
+        });
+    }
+    
     function wordAllocation(){
         return withConnection(function($connection){
             $valid_word = false;

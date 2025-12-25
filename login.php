@@ -1,3 +1,11 @@
+<?php
+    session_start();
+    
+    // Redirection
+    $uri = $_SERVER["REQUEST_URI"];
+    $uri_array = explode("/", $uri);
+    $_SESSION['redirect'] = $uri_array[count($uri_array) - 1];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

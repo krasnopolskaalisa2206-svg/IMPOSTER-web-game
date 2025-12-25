@@ -9,5 +9,11 @@
     <a href="main-menu.html">Back</a>
     <br>
     <a href="lobby.html">host</a>
+
+
+    <form action = "includes/host-room.inc.php" method = "POST">
+        <input type = "text" id = "room_name" name = "room_name">
+        <input type = "submit" id = "submit" name = "submit" value = "Start">
+    </form> 
 </body>
 </html>

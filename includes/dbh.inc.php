@@ -95,7 +95,7 @@
             $sql_add = substr($sql_add, 0, strlen($sql_add) - 2);
             $sql_add = $sql_add . ")";
             $sql = $sql . $sql_add;
-            
+
             // Create a prepared statement
             $stmt = mysqli_stmt_init($connection);
             if (!mysqli_stmt_prepare($stmt, $sql)){

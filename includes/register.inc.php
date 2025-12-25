@@ -15,11 +15,28 @@
         $password = $_POST["password"];
 
         // if the validation was not passed or if the username exists we redirect
-        if (!formValidation($username, $password) || uidValidationUser($username)){
+        if (!formValidation($username, $password) || uidValidation($username)){
             Redirect();
         } else {
-            insertUser($username, $password);
+            try{
+                if(insertUser($username, $password)){              
+                    $result = fetchPlayerRecord($username);
+                    if($result == false){
+                        throw new Exception();
+                    }
+                    $_SESSION['id'] = $result['id'];
+                    $_SESSION["username"] = $username;
+                    header("Location: ../main-menu.php");
+                } else{
+                    // This is a placeholder, replace with an actual error code
+                    echo "Something went wrong, user was not inserted";
+                    exit();
+                }
+            } catch(Exception $e){
+                echo "Something went wrong, user was invalidated";
             }
+        }
+        unset($_POST["submit"]);
     } else {
         Redirect();
     }

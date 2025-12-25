@@ -23,11 +23,39 @@
             return false;
         }
     }
-    function uidValidationUser($username){
-        return uidValidationDB($username);
+    function uidValidation($username){
+        return withConnection(function($connection) use ($username){ 
+            $parameters = array($username);
+            $result = selectFunction($connection, "username", "players", "",  "username = ?", $parameters);
+            if(mysqli_num_rows($result) > 0){
+                // if the username exists then return true
+                return true;
+            } else{
+                // if it doesn't return false
+                return false;
+            }
+        });
     }
-    function passwordValidationUser($username, $password){
-        return passwordValidationDB($username, $password);
+    function passwordValidation($username, $raw_password){
+        return withConnection(function($connection) use ($username, $raw_password){
+            // First, fetch the stored hash from the database
+            $parameters = array($username);
+            $result = selectFunction($connection, "password", "players", "", "username = ?", $parameters);
+            
+            if(mysqli_num_rows($result) !== 1){
+                return false;
+            }
+            
+            $row = mysqli_fetch_assoc($result);
+            $stored_hash = $row['password'];
+            
+            // Verify the password against the stored hash
+            if(password_verify($raw_password, $stored_hash)){
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
 
