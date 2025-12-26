@@ -1,5 +1,7 @@
 <?php
     session_start();
+    $uid = $_SESSION["username"];
+    echo "<h1>Welcome, $uid</h1>";
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,17 +1,47 @@
 <?php
     require_once "dbh.inc.php";
     
-    function roomGeneration($room_name){
+    function generateRoom($room_name){
         return withConnection(function($connection) use ($room_name){
-            $parameters = array($room_name);
-            if(insertFunction($connection, "rooms", [], $parameters)){
+            $parameters = array($room_name, "lobby");
+
+            if(insertFunction($connection, "rooms", ["name", "status"], $parameters)){
+                $room_id = mysqli_insert_id($connection);
+                $_SESSION["room_id"] = $room_id;
+                if(!insertOwnerPlayerSessionRecord()){
+                    return false;
+                }
                 return true;
             } else{
                 return false;
             }
         });
     }
-    
+    function fetchRoomRecord($room_id){
+         return withConnection(function($connection) use ($room_id){
+            if(empty($room_id)){
+                return false;
+            }
+            try{
+                // password hash
+                $parameters = array($room_name);  
+                $result = selectFunction($connection, "*", "rooms", "", "room_id = ?", $parameters);
+                if (mysqli_num_rows($result) !== 1){
+                    return false;
+                }
+                $assoc = [];
+                while($row = mysqli_fetch_assoc($result)){
+                    array_push($assoc, $row);
+                }
+                // assumption of this return is that we already validated that there is only one record of that player
+                return $assoc[0];
+            } catch (Exception $e){
+                echo "Error fetching player Record";
+            } finally {
+                exit();
+            }
+        });
+    }
     function wordAllocation(){
         return withConnection(function($connection){
             $valid_word = false;
