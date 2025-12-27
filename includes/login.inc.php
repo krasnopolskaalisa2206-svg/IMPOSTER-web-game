@@ -5,14 +5,12 @@
 
     if(isset($_POST["submit"])){
 
-        // Validate
-        // Insert or not
         $username = $_POST["username"]; 
         $password = $_POST["password"];
 
         // if the validation was not passed or if the username exists we redirect
         if (!formValidation($username, $password) || !passwordValidation($username, $password)){
-            // Redirect();
+            Redirect();
         } else {
                 try{           
                     $result = fetchPlayerRecord($username);
@@ -22,7 +20,10 @@
                 } catch(Exception $e){
                     echo "Something went wrong, user was invalidated";
                 }   
-        } 
+        }
+        unset($_POST["password"]);
+        unset($_POST["username"]);
+        unset($_POST["submit"]);
     } else {
         Redirect();
     }
@@ -31,8 +32,8 @@
         $redirect = $_SESSION['redirect'];
         if(!$redirect){
             header("Location: ../index.php");
-        }
-        // Optionally include errors sent
-        header("Location: ../$redirect");
+        } else {
+            header("Location: ../$redirect");
+        }    
     }
 ?>

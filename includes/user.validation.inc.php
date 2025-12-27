@@ -38,7 +38,6 @@
     }
     function passwordValidation($username, $raw_password){
         return withConnection(function($connection) use ($username, $raw_password){
-            // First, fetch the stored hash from the database
             $parameters = array($username);
             $result = selectFunction($connection, "password", "players", "", "username = ?", $parameters);
             
@@ -54,6 +53,19 @@
                 return true;
             } else {
                 return false;
+            }
+        });
+    }
+    function playerSessionRecordValidation(){
+        return withConnection(function($connection){
+            // First, fetch the stored hash from the database
+            $parameters = array($_SESSION["id"]);
+            $result = selectFunction($connection, "*", "player_session", "", "player_id = ?", $parameters);
+            
+            if(mysqli_num_rows($result) !== 0){
+                return false;
+            } else {
+                return true;
             }
         });
     }

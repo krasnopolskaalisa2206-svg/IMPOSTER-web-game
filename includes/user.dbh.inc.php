@@ -1,6 +1,7 @@
 <?php
     require_once "dbh.inc.php";
     require_once "system.dbh.inc.php";
+    require_once "user.validation.inc.php";
     
     function insertUser($username, $raw_password){
         return withConnection(function($connection) use ($username, $raw_password){
@@ -18,11 +19,10 @@
 
     function fetchPlayerRecord($username){
          return withConnection(function($connection) use ($username){
-            if($username == ""){
+            if(empty($username)){
                 return false;
             }
             try{
-                // password hash
                 $parameters = array($username);  
                 $result = selectFunction($connection, "*", "players", "", "username = ?", $parameters);
                 if (mysqli_num_rows($result) !== 1){
@@ -42,18 +42,21 @@
     function insertOwnerPlayerSessionRecord(){
         return withConnection(function($connection){
             try {
+                if(!playerSessionRecordValidation()){
+                    return false;
+                }
                 $player_id = $_SESSION["id"];
                 $room_id = $_SESSION["room_id"];
                 $parameters = array($player_id, $room_id);
 
-                if(insertFunction($connection, 'player_session', ["player_id","room_id"], $parameters)){
+                if(insertFunction($connection, "player_session", ["player_id","room_id"], $parameters)){
                     $_SESSION["room_id"] = $room_id;
                     return true;
                 } else{
                     return false; 
                 }
             } catch (Exception $e){
-                //echo $e->getMessage();
+                echo $e->getMessage();
                 return false;
             }
         });

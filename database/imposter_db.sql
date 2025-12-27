@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Дек 22 2025 г., 23:17
+-- Время создания: Дек 27 2025 г., 10:16
 -- Версия сервера: 10.4.32-MariaDB
 -- Версия PHP: 8.2.12
 
@@ -94,10 +94,34 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`id`, `username`, `password`) VALUES
-(1, 'username', 'passwprkd'),
-(2, 'user', 'test'),
-(3, 'CoolName', 'password'),
-(4, 'AnotherCoolName', '$2y$10$zaggPY5nVBVBJ95q/Cri1ec83EoIzhggWbfYMlJycmT88PfMbDSC6');
+(7, 'newStuff', '$2y$10$5WMDVXEeyMui1xkYvC/IzuTtjhJxUyroFxQ5tRbJ1LRavNDdFjnvW'),
+(15, 'test_username', '$2y$10$Gr1JpFEEhypT7gVeGvI/xeK3ntCxgOTphSVm2c/Guhc8dVc9v5tIW'),
+(16, 'test_username_2', '$2y$10$bw5g34HHXQB8vn9GJYeDAudkfSU.fw6ap7uhIkgYIp0kaymsO5DYK'),
+(17, 'test_username_3', '$2y$10$AmXR7guyANTk7BDMD1YDNOK5dnipnQ8AWA/yHRuVa/n4jQLzuYAwe'),
+(18, 'user1', '$2y$10$CUaI4.ZKFZYOaUhKyMUfTuPHelqLAxpFK1sBvyGtdUvt7GD4Ol9kW');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `player_session`
+--
+
+CREATE TABLE `player_session` (
+  `id` int(11) NOT NULL,
+  `player_id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Дамп данных таблицы `player_session`
+--
+
+INSERT INTO `player_session` (`id`, `player_id`, `room_id`) VALUES
+(1, 7, 7),
+(2, 7, 8),
+(3, 7, 8),
+(4, 7, 9),
+(5, 7, 9);
 
 -- --------------------------------------------------------
 
@@ -152,6 +176,33 @@ INSERT INTO `pos_tags` (`tag_id`, `tag`, `description`) VALUES
 (34, 'WP', 'Wh-pronoun'),
 (35, 'WP$', 'Possessive wh-pronoun'),
 (36, 'WRB', 'Wh-adverb');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `rooms`
+--
+
+CREATE TABLE `rooms` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `status` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Дамп данных таблицы `rooms`
+--
+
+INSERT INTO `rooms` (`id`, `name`, `status`) VALUES
+(1, 'testroom', 'lobby'),
+(2, 'Player\'s Room', 'lobby'),
+(3, 'Player\'s Room', 'lobby'),
+(4, 'Player\'s Room', 'lobby'),
+(5, 'Player\'s Room', 'lobby'),
+(6, 'Player\'s Room', 'lobby'),
+(7, 'Player\'s Room', 'lobby'),
+(8, 'Player\'s Room', 'lobby'),
+(9, 'Player\'s Room', 'lobby');
 
 -- --------------------------------------------------------
 
@@ -424705,10 +424756,24 @@ ALTER TABLE `players`
   ADD KEY `username` (`username`);
 
 --
+-- Индексы таблицы `player_session`
+--
+ALTER TABLE `player_session`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `player_id` (`player_id`),
+  ADD KEY `room_id` (`room_id`);
+
+--
 -- Индексы таблицы `pos_tags`
 --
 ALTER TABLE `pos_tags`
   ADD PRIMARY KEY (`tag_id`);
+
+--
+-- Индексы таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Индексы таблицы `words`
@@ -424741,11 +424806,30 @@ ALTER TABLE `word_pos`
 -- AUTO_INCREMENT для таблицы `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT для таблицы `player_session`
+--
+ALTER TABLE `player_session`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT для таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
+
+--
+-- Ограничения внешнего ключа таблицы `player_session`
+--
+ALTER TABLE `player_session`
+  ADD CONSTRAINT `player_session_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `player_session_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `word_categories`
