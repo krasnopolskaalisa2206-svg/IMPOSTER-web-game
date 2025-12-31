@@ -13,7 +13,7 @@
 <body>
     <a href="index.php">back</a>
     <br>
-    <a href="join-room.php">join room</a>
+    <a href="join-room.html">join room</a>
     <br>
     <a href="host-room.php">host room</a>
 </body>
