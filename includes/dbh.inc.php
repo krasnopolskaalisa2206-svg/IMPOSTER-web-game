@@ -198,7 +198,7 @@
                 return $result;
             }
         } catch(Exception $e){
-            echo "Error " . $e->getMessage();
+            echo "Error Select" . $e->getMessage();
             exit();
         }
 

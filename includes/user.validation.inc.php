@@ -59,13 +59,21 @@
     function playerSessionRecordValidation(){
         return withConnection(function($connection){
             // First, fetch the stored hash from the database
-            $parameters = array($_SESSION["id"]);
-            $result = selectFunction($connection, "*", "player_session", "", "player_id = ?", $parameters);
-            
-            if(mysqli_num_rows($result) !== 0){
+            if(empty($_SESSION["id"])){
                 return false;
-            } else {
-                return true;
+            }
+            $parameters = array($_SESSION["id"]);
+
+            try{
+                $result = selectFunction($connection, "*", "player_session", "", "player_id = ?", $parameters);
+                
+                if(mysqli_num_rows($result) !== 0){
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch(Exception $e){
+                echo "Something went wrong";
             }
         });
     }

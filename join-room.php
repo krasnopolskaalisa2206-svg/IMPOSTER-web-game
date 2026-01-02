@@ -11,5 +11,10 @@
     <a href="main-menu.html">Back</a>
     <br>
     <a href="lobby.html">join</a>
+    <form id="joinRoomForm">
+        <!--Join the room-->
+        <input type="text" id ="roomBox" name="roomBox">
+    </form>
+    <button id="submit">Join</button>
 </body>
 </html>

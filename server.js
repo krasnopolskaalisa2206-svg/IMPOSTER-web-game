@@ -8,7 +8,7 @@ app.use(
         origin: "*"
     })
 );
-// This creates requests that accepts requests on the port 4000
+// This creates a server that accepts requests on the port 4000
 const expressServer = app.listen(4000);
 const socketio = require("socket.io");
 // This creates a socket.io server on the Express server

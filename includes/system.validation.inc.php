@@ -3,9 +3,7 @@
     
     session_start();
     function roomValidation($room_id){
-        return withConnection(function($room_id){
-            $parameters = array($room_id);
-
+        return withConnection(function($connection) use ($room_id){
             $result = fetchRoomRecord($room_id);
             if($result === false){
                 return false;

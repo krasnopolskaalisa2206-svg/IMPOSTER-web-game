@@ -24,8 +24,8 @@
             }
             try{
                 // password hash
-                $parameters = array($room_name);  
-                $result = selectFunction($connection, "*", "rooms", "", "room_id = ?", $parameters);
+                $parameters = array($room_id);  
+                $result = selectFunction($connection, "*", "rooms", "", "id = ?", $parameters);
                 if (mysqli_num_rows($result) !== 1){
                     return false;
                 }
