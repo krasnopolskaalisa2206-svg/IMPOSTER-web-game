@@ -37,8 +37,6 @@
                 return $assoc[0];
             } catch (Exception $e){
                 echo "Error fetching player Record";
-            } finally {
-                exit();
             }
         });
     }
