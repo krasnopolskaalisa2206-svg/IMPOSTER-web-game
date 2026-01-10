@@ -3,33 +3,40 @@
      * Script Log: 
      * 19.12.2025: Artem: Implemented user crearion
      * 
+     * 24.12.2025: Artem: changed validation settings
      * 
     */
+
     session_start();
+    require_once "user.validation.inc.php";
     if(isset($_POST["submit"])){
-        try{
-            require_once "dbh.inc.php";
-            require_once "user.validation.inc.php";
-        }
-        catch(Exception $e){
-            // Redirect the user with an appropriate error
-            Redirect();
-            exit();
-        }
-        // Validate
-        // Insert or not
+
         $username = $_POST["username"]; 
         $password = $_POST["password"];
 
         // if the validation was not passed or if the username exists we redirect
-        if (!registrationFormValidation($username, $password) || !uidDoesNotExist($username)){
+        if (!formValidation($username, $password) || uidValidation($username)){
             Redirect();
         } else {
-            withConnection(function($connection) use ($username, $password){
-                $parameters = [$username, $password];
-                insertFunction($connection, 'players', ["username","password"], $parameters);
-            });
+            try{
+                if(insertUser($username, $password)){              
+                    $result = fetchPlayerRecord($username);
+                    if($result == false){
+                        throw new Exception();
+                    }
+                    $_SESSION['id'] = $result['id'];
+                    $_SESSION["username"] = $username;
+                    header("Location: ../main-menu.php");
+                } else{
+                    // This is a placeholder, replace with an actual error code
+                    echo "Something went wrong, user was not inserted";
+                    exit();
+                }
+            } catch(Exception $e){
+                echo "Something went wrong, user was invalidated";
             }
+        }
+        unset($_POST["submit"]);
     } else {
         Redirect();
     }
