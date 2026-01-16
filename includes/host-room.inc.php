@@ -16,7 +16,7 @@
                     }
                     //exit();
                 } else {
-                    header("Location: lobby.php");
+                    header("Location: ../lobby.php");
                 }
             } catch (Exception $e){
                 echo "Exception at validation " . $e->getMessage();
