@@ -11,19 +11,32 @@
         <div class="outer-border">
             <div class="inner-border">
                 <div class="login-box">
-                    <h1>Username</h1>
-                    <input type="text" class="input-field" id="username" placeholder="- - - - -">
-    
-                    <h1>Password</h1>
-                    <input type="password" class="input-field" id="password" placeholder="• • • • •">
-    
-                    <button class="submit-button" id="submit-btn" onclick="handleRegister()">Register!</button>
+                    <form action = "includes/register.inc.php" method = "POST">
+                        <h1>Username</h1>
+                        <input type="text" class="input-field" id="username" placeholder="- - - - - - - - - - - - -" name="username" required>
+                        <p id="error-msg" style="display: none;" class="error-msg">Invalid username</p> 
+                        <!-- SOMEONE STYLE THE ERROR MESSAGE -->
+                        <h1>Password</h1>
+                        <input type="password" class="input-field" id="password" placeholder="• • • • • • • • • • • • • • •" name="password" required>
+        
+                        <button class="submit-button" id="submit-btn" name="submit" type="submit">Register</button>
+                    </form>
                 </div>
             </div>
         </div>
+
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const error = params.get("error");
+
+            if (error) {
+                document.getElementById("error-msg").style.display = "block";
+            }
+
+        </script>
     
         <!-- JavaScript here: just assigning functions to the buttons-->
-        <script>
+        <!-- <script>
             function handleRegister() {
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
@@ -38,5 +51,5 @@
                     alert("Please fill in all fields");
                 }
             }
-        </script>
+        </script> -->
     </html>

@@ -16,7 +16,7 @@
                     $result = fetchPlayerRecord($username);
                     $_SESSION['id'] = $result['id'];
                     $_SESSION["username"] = $username;
-                    header("Location: ../main-menu.php");
+                    header("Location: ../main-menu.html");
                 } catch(Exception $e){
                     echo "Something went wrong, user was invalidated";
                 }   
@@ -31,9 +31,9 @@
         // Redirect the user in case of illegal access
         $redirect = $_SESSION['redirect'];
         if(!$redirect){
-            header("Location: ../index.php");
+            header("Location: ../login.html");
         } else {
-            header("Location: ../$redirect");
+            header("Location: ../login.html?error=invalid");
         }    
     }
 ?>
