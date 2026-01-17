@@ -26,8 +26,11 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 15px;
+    gap: 22px;
+    box-shadow: inset 0 0 20px  rgba(0, 0, 0, 0.501);
 }
+
+/* ----------------------- home page ------------------------------ */
 
 .home-button {
     background-color: #ffa601;
@@ -36,14 +39,84 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 60px;
-    height: 200px;
+    height: 150px;
     width: 400px;
     display: flex;
     font-size: 70px;
     font-family: 'Dingos Stamp', sans-serif;
+    box-shadow: 5px 18px rgba(0, 0, 0, 0.382); 
+    transition: transform 0.2s;
+}
+
+.home-button:hover {
+transform: scale(1.05); 
+}
+.home-button:active {
+transform: scale(0.98);
+}
+#register-btn {
+    border: 5px solid #7778ed;
+}
+#login-btn {
+    border: 5px solid #ff5d83;
 }
 
 @font-face {
     font-family: 'Dingos Stamp';
     src: url('style-assets/DCC\ -\ Bushido.ttf') format('truetype');
+}
+
+/* -------------------------- register and login pages ---------------- */
+
+.login-box {
+    background-color: #ffa601;
+    width: 500px;
+    border: 5px solid #b57600;
+    border-radius: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 15px 18px rgba(0, 0, 0, 0.382);
+    gap: 5px;
+}
+.input-field {
+    background-color: #b57600;
+    color: white;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    padding-left: 20px;
+    border: 5px solid #574012;
+    border-radius: 60px;
+    height: 100px;
+    width: 400px;
+    display: flex;
+    font-size: 40px;
+    font-family: 'Dingos Stamp', sans-serif;
+    box-shadow: 10px 10px rgba(237, 83, 0, 0.382); 
+}
+
+h1 {
+    color: white;
+    margin: 0 0 10px 0;
+    margin-bottom: 0px;
+    font-size: 70px;
+    padding-top: 15px;
+    font-family: 'Dingos Stamp', sans-serif;
+}
+
+.submit-button {
+    background-color: #fa8801;
+    color: white;
+    cursor: pointer;
+    border: 5px solid #603d12;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    margin-block: 15px;
+    border-radius: 20px;
+    display: flex;
+    font-size: 40px;
+    font-family: 'Dingos Stamp', sans-serif;
 }
