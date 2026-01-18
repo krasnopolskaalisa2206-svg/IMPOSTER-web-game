@@ -11,33 +11,19 @@
     <div class="outer-border">
         <div class="inner-border">
             <div class="login-box">
-                <form action = "includes/login.inc.php" method = "POST">
-                    <h1>Username</h1>
-                    <input type="text" class="input-field" id="username" placeholder="- - - - - - - - - - - - -" name="username" required>
+                <h1>Username</h1>
+                <input type="text" class="input-field" id="username" placeholder="- - - - -">
 
-                    <h1>Password</h1>
-                    <input type="password" class="input-field" id="password" placeholder="• • • • • • • • • • • • • • •" name="password" required>
+                <h1>Password</h1>
+                <input type="password" class="input-field" id="password" placeholder="• • • • •">
 
-                    <p id="error-msg" style="display: none;" class="error-msg">Invalid username or password</p> 
-                    <!-- SOMEONE STYLE THE ERROR MESSAGE -->
-                    <button class="submit-button" id="submit-btn" name="submit" type="submit">Login</button>
-                </form>
+                <button class="submit-button" id="submit-btn" onclick="handleLogin()">Login!</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const error = params.get("error");
-
-        if (error) {
-            document.getElementById("error-msg").style.display = "block";
-        }
-
-    </script>
-
     <!-- JavaScript here: just assigning functions to the buttons-->
-    <!-- <script>
+    <script>
         function handleLogin() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -52,5 +38,5 @@
                 alert("Please fill in all fields");
             }
         }
-    </script> -->
+    </script>
 </html>

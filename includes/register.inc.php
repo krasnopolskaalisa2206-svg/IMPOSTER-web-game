@@ -26,7 +26,7 @@
                     }
                     $_SESSION['id'] = $result['id'];
                     $_SESSION["username"] = $username;
-                    header("Location: ../main-menu.html");
+                    header("Location: ../main-menu.php");
                 } else{
                     // This is a placeholder, replace with an actual error code
                     echo "Something went wrong, user was not inserted";
@@ -44,9 +44,9 @@
         // Redirect the user in case of illegal access
         $redirect = $_SESSION['redirect'];
         if(!$redirect){
-            header("Location: ../register.html");
+            header("Location: ../index.php");
         }
         // Optionally include errors sent
-        header("Location: ../register.html?error=invalid");
+        header("Location: ../$redirect");
     }
 ?>

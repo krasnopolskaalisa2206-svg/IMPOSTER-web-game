@@ -27,7 +27,7 @@
         $db_servername = "localhost";
         $db_username = "root";
         $db_password = "";
-        $db_name = "mysql";
+        $db_name = "imposter_db";
         $connection = "";
 
         // Establish connection
