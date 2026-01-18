@@ -33,7 +33,7 @@
         if(!$redirect){
             header("Location: ../index.php");
         } else {
-            header("Location: ../$redirect");
+            header("Location: ../$redirect?error=invalid");
         }    
     }
 ?>

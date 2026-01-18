@@ -47,6 +47,6 @@
             header("Location: ../index.php");
         }
         // Optionally include errors sent
-        header("Location: ../$redirect");
+        header("Location: ../$redirect?error=invalid");
     }
 ?>
