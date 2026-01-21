@@ -26,7 +26,7 @@
         // Create a CONFIG file
         $db_servername = "dbhost.cs.man.ac.uk";
         $db_username = "q29570ss"; // *** Use your own username and password here ***
-        $db_password = "82q/eCbfXuwbp8nWV1nUP5QRJP8tfmSWdu3GYNjAzY";
+        $db_password = "82q/eCbfXuwbp8nWV1nUP5QRJP8tfmSWdu3GYMNjAzY";
         $db_name = "2025_comp1tut_y6";
         $connection = "";
 
