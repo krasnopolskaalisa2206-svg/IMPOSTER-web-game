@@ -24,10 +24,10 @@
         
         // These are placeholder values for LOCAL TESTING
         // Create a CONFIG file
-        $db_servername = "localhost";
-        $db_username = "root";
-        $db_password = "";
-        $db_name = "mysql";
+        $db_servername = "dbhost.cs.man.ac.uk";
+        $db_username = "q29570ss"; // *** Use your own username and password here ***
+        $db_password = "82q/eCbfXuwbp8nWV1nUP5QRJP8tfmSWdu3GYNjAzY";
+        $db_name = "2025_comp1tut_y6";
         $connection = "";
 
         // Establish connection
@@ -141,7 +141,6 @@
         // Implement update
     }
     function deleteFunction($connection){
-        // Implement delete
     }
 
     function selectFunction($connection, $field_names, $table_name, $joins = "", $condition = "", $parameters=[]){
