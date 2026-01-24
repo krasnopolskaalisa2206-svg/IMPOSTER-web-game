@@ -1,16 +1,34 @@
 <?php
     session_start();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="home-style.css">
     <title>Imposter</title>
 </head>
 <body>
-    <a href="login.php">login</a>
-    <br>
-    <a href="register.php">register</a>
+    
+    <!-- The div class=outber border etc is for css to make double border-->
+    <div class="outer-border">
+        <div class="inner-border">
+            <button class="home-button" id="register-btn">Register</button>
+            <button class="home-button" id="login-btn">Login</button>
+        </div>
+    </div>
+
+    <!-- JavaScript here: just assigning functions to the buttons-->
+    <script>
+        document.getElementById("register-btn").addEventListener('click', function() {
+            window.location.href="register.html";
+        });
+
+        document.getElementById("login-btn").addEventListener('click', function() {
+            window.location.href="login.html";
+        });
+    </script>
 </body>
 </html>
