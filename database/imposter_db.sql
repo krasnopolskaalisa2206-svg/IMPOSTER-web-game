@@ -160,3 +160,85 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE `categories` (
+  `category_id` int(2) NOT NULL,
+  `category_title` varchar(46) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+INSERT INTO `categories` (`category_id`, `category_title`) VALUES
+(1, 'Animals'),
+(2, 'Professions'),
+(3, 'Cities'),
+(4, 'Food'),
+(5, 'Sports'),
+(6, 'Celebrities'),
+(7, 'Movies and TV Shows'),
+(8, 'Hobbies'),
+(9, 'Programming Languages'),
+(10, 'Diseases');
+
+-- Структура таблицы `words`
+--
+
+CREATE TABLE `words` (
+  `word_id` int(6) NOT NULL,
+  `word` varchar(25) DEFAULT NULL,
+  `category_id` varchar(6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Дамп данных таблицы `words`
+--
+
+INSERT INTO `words` (`word_id`, `word`, `category_id`) VALUES
+(1, 'cat', 1),
+(2, 'dog', 1),
+(3, 'mouse', 1),
+(4, 'horse', 1),
+(5, 'chicken', 1),
+(6, 'cow', 1),
+(7, 'sheep', 1),
+(8, 'goat', 1),
+(9, 'eagle', 1),
+(10, 'frog', 1),
+(11, 'software engineer', 2),
+(12, 'fire fighter', 2),
+(13, 'doctor', 2),
+(14, 'teacher', 2),
+(15, 'archeologist', 2),
+(16, 'palaeontologist', 2),
+(17, 'forensic scientist', 2),
+(18, 'detective', 2),
+(19, 'police officer', 2),
+(20, 'farmer', 2),
+(21, 'London', 3),
+(22, 'Paris', 3),
+(23, 'Miami', 3),
+(24, 'Sydney', 3),
+(25, 'Cairo', 3),
+(26, 'Amsterdam', 3),
+(27, 'Kyiv', 3),
+(28, 'Tokyo', 3),
+(29, 'Toronto', 3),
+(30, 'New York', 3),
+(31, 'Pizza', 4),
+(32, 'Carbonara', 4),
+(33, 'Ramen', 4),
+(34, 'Pad Thai', 4),
+(35, 'Haggis', 4),
+(36, 'Taco', 4),
+(37, 'Cheeseburger', 4),
+(38, 'Poutine', 4),
+(39, 'Foie Gras', 4),
+(40, 'Sushi', 4),
+(41, 'Football', 5),
+(42, 'Basketball', 5),
+(43, 'Swimming', 5),
+(44, 'Baseball', 5),
+(45, 'Wrestling', 5),
+(46, 'Golf', 5),
+(47, 'Hockey', 5),
+(48, 'Rugby', 5),
+(49, 'Cricket', 5),
+(50, 'Fencing', 5),
