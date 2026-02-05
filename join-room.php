@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="http://localhost:4000/socket.io/socket.io.min.js"></script>
     <script src="includes/JS/scripts.js"></script>
-    <link rel =  "stylesheet" href="join-room-style.css">
+    <link rel =  "stylesheet" href="home-style.css">
     <title>Imposter</title>
 </head>
 <body>
