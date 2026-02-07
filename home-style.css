@@ -120,3 +120,47 @@ h1 {
     font-size: 40px;
     font-family: 'Dingos Stamp', sans-serif;
 }
+
+/* -------------------------- voting phase ---------------- */
+
+#Voting-Title {
+    font-family:'Dingos Stamp', sans-serif;
+    color: white;
+    justify-content: center;
+    text-align: center;
+}
+
+.player-box {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#ffa601;
+    border:5px solid #603d12;
+    border-radius:30px;
+    padding:20px;
+    width:600px;
+    margin:15px auto;
+    font-family:'Dingos Stamp', sans-serif;
+    font-size:35px;
+    box-shadow:10px 10px rgba(0,0,0,0.3);
+}
+
+.player-vote-btn {
+    background-color: red;
+    border: 4px solid #603d12;
+    border-radius: 20px;
+    font-size: 25px;
+    font-family: 'Dingos Stamp', sans-serif;
+    color: white;
+    padding: 8px 20px;
+    cursor: pointer;
+    box-shadow: 6px 6px rgba(0,0,0,0.3);
+}
+
+.player-vote-btn:active {
+    transform: scale(0.90);
+}
+
+.player-vote-btn:hover {
+    transform: scale(1.05); 
+}

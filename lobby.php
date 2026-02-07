@@ -6,7 +6,7 @@
     <title>Imposter</title>
 </head>
 <body>
-    <a href="main-menu.html">Back</a>
+    <a href="main-menu.php">Back</a>
     <br>
     <a href="word-allocation.html">start</a>
 </body>
