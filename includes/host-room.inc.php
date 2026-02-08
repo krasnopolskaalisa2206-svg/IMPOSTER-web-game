@@ -6,28 +6,30 @@
     if(isset($_POST["submit"])){
         if(isset($_POST["room_name"])){
             $room_name = $_POST["room_name"];
-            try{     
-                if(!generateRoom($room_name)){
+            try{   
+                $room_code = generateRoom($room_name);  
+
+                if(!$room_code){
                     echo "Error at validation";
                     if(!insertOwnerPlayerSessionRecord($_SESSION["id"])){
                         echo " didn't insert OPSR";
                     } else {
                         echo " didn't generate a room";
                     }
-                    //exit();
+                    exit();
                 } else {
                     header("Location: ../lobby.php");
                 }
             } catch (Exception $e){
                 echo "Exception at validation " . $e->getMessage();
-                // Redirect();  
+                Redirect();  
             } 
         } else {
             echo "Room name wasn't set";
-            // Redirect();
+            Redirect();
         }
     }else{
-        // Redirect();
+        Redirect();      // i uncommented the redirects and exits
     }
     function Redirect(){
         // Redirect the user in case of illegal access

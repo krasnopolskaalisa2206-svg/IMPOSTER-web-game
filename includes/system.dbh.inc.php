@@ -1,22 +1,48 @@
 <?php
     require_once "dbh.inc.php";
-    
-    function generateRoom($room_name){
+ //--------------------
+    function generateRoom($room_name){      // this function now returns room_code or false (old returned true or false)
         return withConnection(function($connection) use ($room_name){
-            $parameters = array($room_name, "lobby");
 
-            if(insertFunction($connection, "rooms", ["name", "status"], $parameters)){
+            $room_code = generateUniqueRoomCode($connection);   // calls function to generate unique room code and if not returns false
+            if(!$room_code) {
+                return false;
+            }
+
+            $parameters = array($room_name, $room_code, "lobby");
+            if(insertFunction($connection, "rooms", ["name", "room_code", "status"], $parameters)){
                 $room_id = mysqli_insert_id($connection);
                 $_SESSION["room_id"] = $room_id;
+
                 if(!insertOwnerPlayerSessionRecord()){
                     return false;
                 }
-                return true;
+                return $room_code;     // it now returns a room_code instead of true
             } else{
                 return false;
             }
         });
     }
+
+ //--------------------
+    function generateUniqueRoomCode($connection) {
+        $maxAttempts = 10;
+        
+        for($i = 0; $i < $maxAttempts; $i++) {
+            $room_code = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT); // generates a unique room code
+            
+            // check if code already exists
+            $parameters = array($room_code);
+            $result = selectFunction($connection, "id", "rooms", "", "room_code = ?", $parameters);
+            
+            if (mysqli_num_rows($result) == 0) {
+                return $room_code;
+            }
+        }
+        
+        return false; // failed to generate unique code after max attempts
+    }
+ //--------------------
     function fetchRoomRecord($room_id){
          return withConnection(function($connection) use ($room_id){
             if(empty($room_id)){
@@ -40,6 +66,7 @@
             }
         });
     }
+ //--------------------
     function wordAllocation(){
         return withConnection(function($connection){
             $valid_word = false;
