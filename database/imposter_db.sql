@@ -157,6 +157,19 @@ ALTER TABLE `player_session`
   ADD CONSTRAINT `player_session_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
+--
+-- Create a column for the 6 digit codes that users can enter
+
+ALTER TABLE `rooms` 
+ADD COLUMN `room_code` VARCHAR(6) UNIQUE NULL AFTER `name`,
+ADD KEY `room_code` (`room_code`);
+
+-- Update existing rooms with random codes only if they don't have a room_code yet
+-- gets a random number 0-999999, LPAD pads numbers with zeroes to make them 6 digits
+
+UPDATE `rooms` SET `room_code` = LPAD(FLOOR(RAND() * 1000000), 6, '0') WHERE `room_code` IS NULL;
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
@@ -300,4 +313,4 @@ INSERT INTO `words` (`word_id`, `word`, `category_id`) VALUES
 (107, 'Cancer', 10),
 (108, 'Diarrhea', 10),
 (109, 'Dementia', 10),
-(100, 'Asthma', 10);
+(110, 'Asthma', 10);
