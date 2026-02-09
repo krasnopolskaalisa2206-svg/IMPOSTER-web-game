@@ -11,13 +11,11 @@
 
                 if(!$room_code){
                     echo "Error at validation";
-                    if(!insertOwnerPlayerSessionRecord($_SESSION["id"])){
-                        echo " didn't insert OPSR";
-                    } else {
-                        echo " didn't generate a room";
-                    }
                     exit();
+
                 } else {
+                    $_SESSION['room_code'] = $room_code;
+                    echo "Room code set to: " . $_SESSION["room_code"];
                     header("Location: ../lobby.php");
                 }
             } catch (Exception $e){

@@ -9,10 +9,11 @@
                 return false;
             }
 
-            $parameters = array($room_name, $room_code, "lobby");
+            $parameters = array($room_name, (string)$room_code, "lobby");
             if(insertFunction($connection, "rooms", ["name", "room_code", "status"], $parameters)){
                 $room_id = mysqli_insert_id($connection);
                 $_SESSION["room_id"] = $room_id;
+                $_SESSION["room_code"] = $room_code;
 
                 if(!insertOwnerPlayerSessionRecord()){
                     return false;
