@@ -24,11 +24,12 @@
         
         // These are placeholder values for LOCAL TESTING
         // Create a CONFIG file
-        $db_servername = "dbhost.cs.man.ac.uk";
-        $db_username = "q29570ss"; // *** Use your own username and password here ***
-        $db_password = "82q/eCbfXuwbp8nWV1nUP5QRJP8tfmSWdu3GYMNjAzY";
-        $db_name = "2025_comp1tut_y6";
+        $db_servername = "localhost";
+        $db_username = "root";
+        $db_password = "";
+        $db_name = "imposter_db";
         $connection = "";
+
 
         // Establish connection
         try{
@@ -51,7 +52,7 @@
             }
         }
     }
-    function insertFunction($connection, $table_name, $attribute_names =[], $parameters){
+    function insertFunction($connection, $table_name, $attribute_names, $parameters){
         $sql ="";
         try{
             if(strlen($table_name)<=0 || count($parameters)<=0){

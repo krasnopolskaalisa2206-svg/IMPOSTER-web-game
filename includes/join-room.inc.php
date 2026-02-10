@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "user.validation.inc.php";
 include "system.validation.inc.php";
 require_once "system.dbh.inc.php";
@@ -35,7 +36,7 @@ try {    // this one checks if u are logged in in case someone manually types th
             "room_id" => $room_id,
             "message" => "Successfully joined room"
         ]);
-    } else { throw new Exception("Failed to join room")}
+    } else { throw new Exception("Failed to join room");}
 
 } catch (Exception $e) {
     http_response_code(400);    // tells browser it's an error

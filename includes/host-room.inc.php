@@ -1,4 +1,5 @@
 <?php
+    session_start();
     require_once "system.dbh.inc.php";
     require_once "user.dbh.inc.php";
     require_once "system.validation.inc.php";
