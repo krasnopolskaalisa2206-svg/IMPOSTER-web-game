@@ -7,10 +7,9 @@ echo "Step 1: Start<br>";
 require_once "includes/system.dbh.inc.php";
 
 echo "Step 2: DB Loaded<br>";
-require_once "includes/user.functions.inc.php";
+
 
 echo "Step 3: Functions Loaded<br>";
-session_start();
 
 // Get room information
 $room_id = $_SESSION["room_id"];
@@ -47,13 +46,20 @@ $room_name = $room['name'] ?? 'Room';
             <input type="text" name="room_id" value="<?php echo $_SESSION['room_id']; ?>">
             <button type="submit" name="submit" class="btn-start">Start</button>
         </form>
+
+
+        <form action = "includes/host-room.inc.php" method = "POST">
+        <input type = "text" id = "room_name" name = "room_name">
+        <input type = "submit" id = "submit" name = "submit" value = "Start">
+        </form>
+
     </div> 
 
-    <!-- Auto-refresh every 3 seconds to show new players -->
+    <!-- Auto-refresh every 3 seconds to show new players
     <script>
         setTimeout(function() {
             location.reload();
         }, 3000);
-    </script>
+    </script> -->
 </body>
 </html>
