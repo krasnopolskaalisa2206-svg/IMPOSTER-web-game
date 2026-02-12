@@ -167,7 +167,7 @@ h1 {
     cursor: pointer;
 
     box-shadow: 0 6px 0 rgba(0,0,0,0.25);
-    background-color: aqua;
+    background-color: #5ce1e6;
 }
 
 .player-vote-2 {
@@ -182,7 +182,7 @@ h1 {
     cursor: pointer;
 
     box-shadow: 0 6px 0 rgba(0,0,0,0.25);
-    background-color: rgb(123, 220, 123);
+    background-color: #92e563;
 }
 
 .player-vote-3 {
@@ -197,7 +197,7 @@ h1 {
     cursor: pointer;
 
     box-shadow: 0 6px 0 rgba(0,0,0,0.25);
-    background-color: rgb(167, 167, 23);
+    background-color: #ffa601;
 }
 
 
