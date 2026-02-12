@@ -10,17 +10,27 @@
 
     <div class="outer-border">
         <div class="inner-border">
-            <button type="button" class="main-menu-button" id="join-room-btn"> JOIN ROOM </button>
-            <button type="button" class="main-menu-button" id="host-room-btn"> HOST ROOM </button>
-            <button type="button" class="main-menu-button" id="back-btn"> BACK </button>
+
+            <div class="top-left-buttons">
+                <button class="circle-btn"><img src="style-assets/settings-logo.png" class="logo"></button>
+                <button class="circle-btn"><img src="style-assets/cosmetics-logo.png" class="logo"></button>
+            </div>
+
+            <div class="button-space">
+            <button type="button" class="main-menu-button" id="join-room-btn"> 
+            <img src="style-assets/green-play-button-icon.png" class="play-icon">
+                <span>JOIN ROOM</span>
+            </button>
+            <button type="button" class="main-menu-button" id="host-room-btn"> 
+            <img src="style-assets/red-play-button-icon.png" class="play-icon">
+                <span>HOST ROOM</span>
+            </button>
+            </div>
+
         </div>
     </div>
 
     <script>
-        document.getElementById("back-btn").addEventListener('click', function() {
-            window.location.href="home.html";
-        });
-
         document.getElementById("join-room-btn").addEventListener('click', function() {
             window.location.href="join-room.php";
         });
