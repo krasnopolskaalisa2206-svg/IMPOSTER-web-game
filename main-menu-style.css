@@ -49,8 +49,8 @@ body {
 /* ----------------------- main menu ------------------------------ */
 
 .circle-btn {
-  width: 85px;
-  height: 85px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
 
   background-color: #7778ed;
@@ -66,8 +66,8 @@ body {
 }
 
 .logo {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     background: transparent;
     border: none;
@@ -106,10 +106,9 @@ body {
     border-radius: 40px;
     padding-right: 25px;
     display: flex;
-    font-size: 25px;
+    font-size: 35px;
     font-family: 'Dingos Stamp', sans-serif;
     transition: transform 0.2s;
-    gap: 10px;
 }
 
 .main-menu-button:hover,.circle-btn:hover {
