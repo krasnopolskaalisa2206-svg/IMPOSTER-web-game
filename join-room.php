@@ -6,23 +6,28 @@
     <script src="http://localhost:4000/socket.io/socket.io.min.js"></script>
     <script src="includes/JS/scripts.js"></script>
     <title>Imposter</title>
+    <link rel =  "stylesheet" href="home-style.css">
 </head>
 <body>
-    <a href="main-menu.html">Back</a>
-    <form id="joinRoomForm">
-        <input 
-            type="text" 
-            id="roomBox" 
-            name="roomBox" 
-            placeholder="000000"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            required
-        >
-        <div id="error-message" class="error"></div>
-        <div id="loading" class="loading">Joining room...</div>
-        <button type="submit" id="submit">Join Room</button>
-    </form>
+        <div class="outer-border">
+            <div class="inner-border">
+                <div class="host-container">
+                    <form id="joinRoomForm">
+                        <div id="loading" class="loading" style="display: none;">JOINING ROOM...</div>
+                        <p>ENTER ROOM CODE</p>
+                        <input type="text" id="roomBox" name="roomBox" placeholder="  •  •  •  •  •  •  " maxlength="6" pattern="[0-9]{6}" class="input-field" required>
+
+                        <div id="error-message" class="error"></div>
+
+                        <div class="btn-container">
+                        <button type="button" class="submit-button" id="back-btn"> BACK </button>
+                        <button type="submit" class="submit-button" id="submit">JOIN</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<!-- ----------------------------------------------- -->
     <?php
         echo $PORT;
     ?>
@@ -47,8 +52,7 @@
             
             // Show loading state
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Joining...';
-            loadingDiv.style.display = 'block';
+            submitBtn.textContent = 'JOINING...';
             
             try {
                 console.log('Attempting to join room:', roomCode);
@@ -74,7 +78,7 @@
                 }
                 
                 if (data.validated) {
-                    console.log('✅ PHP validation successful:', data);
+                    console.log('PHP validated successfully:', data);
                     
                     // Redirect to lobby
                     // The lobby.php page will handle Socket.IO connection
