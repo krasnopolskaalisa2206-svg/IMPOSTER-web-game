@@ -36,17 +36,22 @@ $room_name = $room['name'] ?? 'Room';
                     <p>ENTER ROOM NAME</p>
 
                     <form action = "includes/host-room.inc.php" method = "POST">
-                    <input type = "text" class="input-field" id = "room_name" placeholder="- - - - - - - - - - - - -" name = "room_name" required>
+                        <input type = "text" class="input-field" id = "room_name" placeholder="- - - - - - - - - - - - -" name = "room_name" required>
+                        <input type="text" name="room_id" value="<?php echo $_SESSION['room_id']; ?>">
 
-                    <div class="btn-container">
-                        <button type="button" class="submit-button" id="back-btn"> BACK </button>
-                        <input type = "submit" class="submit-button" id = "start-btn" name = "submit" value = "START">
-                    </div>
+                        <div class="btn-container">
+                            <button type="button" class="submit-button" id="back-btn"> BACK </button>
+                            <input type = "submit" class="submit-button" id = "start-btn" name = "submit" value = "START">
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
+    <script>
+        document.getElementById("back-btn").addEventListener('click', function() {
+            window.location.href="main-menu.php";
+        }); </script>
 
     <!-- Auto-refresh every 3 seconds to show new players
     <script>

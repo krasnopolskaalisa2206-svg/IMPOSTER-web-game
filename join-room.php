@@ -33,6 +33,9 @@
     ?>
 
     <script>
+        document.getElementById("back-btn").addEventListener('click', function() { 
+            window.location.href="main-menu.php";});
+
         document.getElementById('joinRoomForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             

@@ -3,12 +3,13 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const mysql = require('mysql2/promise');
+const fetch = require('node-fetch'); // npm install node-fetch@2
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {
     cors: {
-        origin: "http://localhost", // Update with your frontend URL
+        origin: "http://localhost",
         methods: ["GET", "POST"]
     }
 });
@@ -26,27 +27,31 @@ const pool = mysql.createPool({
 // Store active rooms in memory
 const activeRooms = new Map();
 
-// Room structure
 class GameRoom {
     constructor(roomId, roomCode) {
         this.roomId = roomId;
         this.roomCode = roomCode;
-        this.players = new Map(); // socketId -> playerData
+        this.players = new Map();       // socketId -> playerData
         this.status = 'lobby';
         this.hostId = null;
-        this.gameData = null;
+        this.gameData = null;           // { word, category, imposterSocketId }
+
+        // Turn system
+        this.turnOrder = [];            // shuffled array of socketIds
+        this.currentTurnIndex = 0;
+        this.playersWhoWent = new Set();// track who has already gone
+
+        // Voting
+        this.votes = new Map();         // voterSocketId -> votedSocketId
     }
 
     addPlayer(socketId, playerData) {
         this.players.set(socketId, playerData);
-        if (!this.hostId) {
-            this.hostId = socketId;
-        }
+        if (!this.hostId) this.hostId = socketId;
     }
 
     removePlayer(socketId) {
         this.players.delete(socketId);
-        // If host leaves, assign new host
         if (this.hostId === socketId && this.players.size > 0) {
             this.hostId = this.players.keys().next().value;
         }
@@ -55,66 +60,107 @@ class GameRoom {
     getPlayerList() {
         return Array.from(this.players.values());
     }
+
+    getTurnOrderList() {
+        return this.turnOrder
+            .filter(sid => this.players.has(sid))
+            .map(sid => ({
+                socketId: sid,
+                username: this.players.get(sid).username
+            }));
+    }
+
+    currentTurnSocketId() {
+        // Skip any players who have left
+        while (
+            this.currentTurnIndex < this.turnOrder.length &&
+            !this.players.has(this.turnOrder[this.currentTurnIndex])
+        ) {
+            this.currentTurnIndex++;
+        }
+        return this.turnOrder[this.currentTurnIndex] ?? null;
+    }
+
+    advanceTurn() {
+        const justWent = this.turnOrder[this.currentTurnIndex];
+        this.playersWhoWent.add(justWent);
+        this.currentTurnIndex++;
+    }
+
+    // True when every (still connected) player has had a turn
+    allPlayersWent() {
+        for (const sid of this.players.keys()) {
+            if (!this.playersWhoWent.has(sid)) return false;
+        }
+        return true;
+    }
 }
+
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+async function fetchWordFromPHP() {
+    try {
+        const res = await fetch('http://localhost/y6-team-project/includes/get-word.inc.php');
+        const data = await res.json();
+        return data; // { word, category }
+    } catch (err) {
+        console.error('Failed to fetch word from PHP:', err);
+        return null;
+    }
+}
+
+// ── SOCKET EVENTS ─────────────────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
 
-    // Join room event
+    // ── JOIN ROOM ────────────────────────────────────────
     socket.on('join-room', async (data) => {
         try {
             const { roomCode, playerId, username } = data;
 
-            // Verify room exists in database
             const [rows] = await pool.query(
                 'SELECT id, status FROM rooms WHERE room_code = ?',
                 [roomCode]
             );
-
             if (rows.length === 0) {
                 socket.emit('join-error', { message: 'Room not found' });
                 return;
             }
 
-            const room = rows[0];
-            const roomId = room.id;
+            const roomId = rows[0].id;
 
-            // Check if player is in player_session table
             const [playerSession] = await pool.query(
                 'SELECT * FROM player_session WHERE player_id = ? AND room_id = ?',
                 [playerId, roomId]
             );
-
             if (playerSession.length === 0) {
                 socket.emit('join-error', { message: 'You are not registered in this room' });
                 return;
             }
 
-            // Create room in memory if it doesn't exist
             if (!activeRooms.has(roomCode)) {
                 activeRooms.set(roomCode, new GameRoom(roomId, roomCode));
             }
 
             const gameRoom = activeRooms.get(roomCode);
 
-            // Check if room is full
             if (gameRoom.players.size >= 10) {
                 socket.emit('join-error', { message: 'Room is full' });
                 return;
             }
 
-            // Add player to room
-            gameRoom.addPlayer(socket.id, {
-                playerId,
-                username,
-                socketId: socket.id
-            });
-
-            // Join socket.io room
+            gameRoom.addPlayer(socket.id, { playerId, username, socketId: socket.id });
             socket.join(roomCode);
-            socket.roomCode = roomCode; // Store for easy access
+            socket.roomCode = roomCode;
 
-            // Send success to player
             socket.emit('join-success', {
                 roomCode,
                 roomId,
@@ -122,27 +168,44 @@ io.on('connection', (socket) => {
                 isHost: gameRoom.hostId === socket.id
             });
 
-            // Notify all players in room
             io.to(roomCode).emit('player-joined', {
                 player: { playerId, username },
                 players: gameRoom.getPlayerList(),
                 playerCount: gameRoom.players.size
             });
 
-            console.log(`Player ${username} joined room ${roomCode}`);
+            // If game already in progress (player rejoining game.php), resend their data
+            if (gameRoom.status === 'in-progress' && gameRoom.gameData) {
+                const { word, category, imposterSocketId } = gameRoom.gameData;
+                const isImposter = socket.id === imposterSocketId;
+                socket.emit('game-data', {
+                    isImposter,
+                    category,
+                    word: isImposter ? null : word
+                });
+                socket.emit('turn-order', { players: gameRoom.getTurnOrderList() });
 
+                const currentSid = gameRoom.currentTurnSocketId();
+                const currentPlayer = gameRoom.players.get(currentSid);
+                if (currentPlayer) {
+                    io.to(roomCode).emit('turn-update', {
+                        currentTurnSocketId: currentSid,
+                        currentTurnUsername: currentPlayer.username
+                    });
+                }
+            }
+
+            console.log(`Player ${username} joined room ${roomCode}`);
         } catch (error) {
             console.error('Join room error:', error);
             socket.emit('join-error', { message: 'Server error' });
         }
     });
 
-    // Leave room event
-    socket.on('leave-room', () => {
-        handlePlayerLeave(socket);
-    });
+    // ── LEAVE ROOM ───────────────────────────────────────
+    socket.on('leave-room', () => handlePlayerLeave(socket));
 
-    // Start game event (host only)
+    // ── START GAME ───────────────────────────────────────
     socket.on('start-game', async () => {
         try {
             const roomCode = socket.roomCode;
@@ -151,33 +214,80 @@ io.on('connection', (socket) => {
             const gameRoom = activeRooms.get(roomCode);
             if (!gameRoom) return;
 
-            // Check if socket is host
             if (gameRoom.hostId !== socket.id) {
                 socket.emit('error', { message: 'Only host can start the game' });
                 return;
             }
-
-            // Check minimum players
             if (gameRoom.players.size < 3) {
                 socket.emit('error', { message: 'Need at least 3 players to start' });
                 return;
             }
 
-            // Update room status in database
+            // Fetch word from PHP
+            const wordData = await fetchWordFromPHP();
+            if (!wordData) {
+                socket.emit('error', { message: 'Failed to get a word. Try again.' });
+                return;
+            }
+            const { word, category } = wordData;
+
+            // Pick random imposter
+            const socketIds = Array.from(gameRoom.players.keys());
+            const imposterSocketId = socketIds[Math.floor(Math.random() * socketIds.length)];
+
+            // Shuffle turn order
+            gameRoom.turnOrder = shuffleArray(socketIds);
+            gameRoom.currentTurnIndex = 0;
+            gameRoom.playersWhoWent = new Set();
+            gameRoom.votes = new Map();
+
+            // Store game data
+            gameRoom.gameData = { word, category, imposterSocketId };
+            gameRoom.status = 'in-progress';
+
             await pool.query(
                 'UPDATE rooms SET status = ? WHERE room_code = ?',
                 ['in-progress', roomCode]
             );
 
-            gameRoom.status = 'in-progress';
-
-            // TODO: Assign imposters, get word from PHP, etc.
-            
-            // Notify all players
+            // Tell everyone to go to game.php
             io.to(roomCode).emit('game-started', {
                 message: 'Game is starting!',
                 players: gameRoom.getPlayerList()
             });
+
+            // Send role data privately to each player
+            for (const [sid] of gameRoom.players) {
+                const isImposter = sid === imposterSocketId;
+                io.to(sid).emit('game-data', {
+                    isImposter,
+                    category,
+                    word: isImposter ? null : word
+                });
+            }
+
+            // Send turn order to everyone
+            io.to(roomCode).emit('turn-order', {
+                players: gameRoom.getTurnOrderList()
+            });
+
+            // Announce first turn
+            const firstSid = gameRoom.currentTurnSocketId();
+            const firstPlayer = gameRoom.players.get(firstSid);
+
+            io.to(roomCode).emit('chat-message', {
+                username: '🎮 Game',
+                message: `${firstPlayer.username}'s turn! Type a word related to the category.`,
+                timestamp: Date.now(),
+                isSystem: true
+            });
+
+            io.to(roomCode).emit('turn-update', {
+                currentTurnSocketId: firstSid,
+                currentTurnUsername: firstPlayer.username
+            });
+
+            console.log(`Game started in ${roomCode}. Imposter: ${gameRoom.players.get(imposterSocketId).username}. Word: ${word}`);
 
         } catch (error) {
             console.error('Start game error:', error);
@@ -185,7 +295,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Chat message
+    // ── CHAT MESSAGE ─────────────────────────────────────
     socket.on('chat-message', (message) => {
         const roomCode = socket.roomCode;
         if (!roomCode) return;
@@ -194,21 +304,141 @@ io.on('connection', (socket) => {
         if (!gameRoom) return;
 
         const player = gameRoom.players.get(socket.id);
-        
-        io.to(roomCode).emit('chat-message', {
-            username: player.username,
-            message,
-            timestamp: Date.now()
-        });
+
+        if (gameRoom.status === 'in-progress') {
+            // Enforce turn
+            if (gameRoom.currentTurnSocketId() !== socket.id) {
+                socket.emit('chat-error', { message: "It's not your turn!" });
+                return;
+            }
+
+            // Broadcast the message
+            io.to(roomCode).emit('chat-message', {
+                username: player.username,
+                message,
+                timestamp: Date.now()
+            });
+
+            // Advance turn
+            gameRoom.advanceTurn();
+
+            // Check if everyone has gone
+            if (gameRoom.allPlayersWent()) {
+                // Switch to voting phase
+                gameRoom.status = 'voting';
+
+                io.to(roomCode).emit('chat-message', {
+                    username: '🎮 Game',
+                    message: 'Everyone has spoken. Time to vote!',
+                    timestamp: Date.now(),
+                    isSystem: true
+                });
+
+                io.to(roomCode).emit('start-voting', {
+                    players: gameRoom.getTurnOrderList()
+                });
+                return;
+            }
+
+            // Announce next turn
+            const nextSid = gameRoom.currentTurnSocketId();
+            const nextPlayer = gameRoom.players.get(nextSid);
+
+            io.to(roomCode).emit('chat-message', {
+                username: '🎮 Game',
+                message: `${nextPlayer.username}'s turn!`,
+                timestamp: Date.now(),
+                isSystem: true
+            });
+
+            io.to(roomCode).emit('turn-update', {
+                currentTurnSocketId: nextSid,
+                currentTurnUsername: nextPlayer.username
+            });
+
+        } else {
+            // Lobby free chat
+            io.to(roomCode).emit('chat-message', {
+                username: player.username,
+                message,
+                timestamp: Date.now()
+            });
+        }
     });
 
-    // Disconnect event
+    // ── SUBMIT VOTE ──────────────────────────────────────
+    socket.on('submit-vote', (data) => {
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const gameRoom = activeRooms.get(roomCode);
+        if (!gameRoom || gameRoom.status !== 'voting') return;
+
+        // Only count one vote per player
+        if (gameRoom.votes.has(socket.id)) return;
+
+        gameRoom.votes.set(socket.id, data.votedSocketId);
+
+        console.log(`Vote in ${roomCode}: ${gameRoom.players.get(socket.id)?.username} voted for ${gameRoom.players.get(data.votedSocketId)?.username}`);
+
+        // Check if everyone has voted
+        if (gameRoom.votes.size >= gameRoom.players.size) {
+            resolveVotes(gameRoom, roomCode);
+        }
+    });
+
+    // ── DISCONNECT ───────────────────────────────────────
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
         handlePlayerLeave(socket);
     });
 });
 
+// ── VOTE RESOLUTION ───────────────────────────────────────────────────────────
+function resolveVotes(gameRoom, roomCode) {
+    // Count votes per socketId
+    const voteCounts = new Map(); // socketId -> count
+    for (const votedSid of gameRoom.votes.values()) {
+        voteCounts.set(votedSid, (voteCounts.get(votedSid) ?? 0) + 1);
+    }
+
+    // Find who got the most votes
+    let maxVotes = 0;
+    let mostVotedSid = null;
+    for (const [sid, count] of voteCounts) {
+        if (count > maxVotes) {
+            maxVotes = count;
+            mostVotedSid = sid;
+        }
+    }
+
+    const { imposterSocketId, word } = gameRoom.gameData;
+    const imposterPlayer = gameRoom.players.get(imposterSocketId);
+    const imposterCaught = mostVotedSid === imposterSocketId;
+
+    // Build vote count breakdown by username
+    const voteCountsByName = {};
+    for (const [sid, count] of voteCounts) {
+        const p = gameRoom.players.get(sid);
+        if (p) voteCountsByName[p.username] = count;
+    }
+
+    io.to(roomCode).emit('vote-results', {
+        imposterUsername: imposterPlayer?.username ?? 'Unknown',
+        imposterCaught,
+        word,
+        voteCounts: voteCountsByName
+    });
+
+    // Reset room status
+    gameRoom.status = 'lobby';
+    gameRoom.gameData = null;
+    gameRoom.turnOrder = [];
+    gameRoom.votes = new Map();
+    gameRoom.playersWhoWent = new Set();
+}
+
+// ── PLAYER LEAVE ──────────────────────────────────────────────────────────────
 function handlePlayerLeave(socket) {
     const roomCode = socket.roomCode;
     if (!roomCode) return;
@@ -217,9 +447,21 @@ function handlePlayerLeave(socket) {
     if (!gameRoom) return;
 
     const player = gameRoom.players.get(socket.id);
+
+    // Remove from turn order
+    const turnIdx = gameRoom.turnOrder.indexOf(socket.id);
+    if (turnIdx !== -1) {
+        gameRoom.turnOrder.splice(turnIdx, 1);
+        if (turnIdx < gameRoom.currentTurnIndex && gameRoom.currentTurnIndex > 0) {
+            gameRoom.currentTurnIndex--;
+        }
+        if (gameRoom.turnOrder.length > 0) {
+            gameRoom.currentTurnIndex = gameRoom.currentTurnIndex % gameRoom.turnOrder.length;
+        }
+    }
+
     gameRoom.removePlayer(socket.id);
 
-    // Notify others
     io.to(roomCode).emit('player-left', {
         player: player ? { playerId: player.playerId, username: player.username } : null,
         players: gameRoom.getPlayerList(),
@@ -227,14 +469,32 @@ function handlePlayerLeave(socket) {
         newHost: gameRoom.hostId
     });
 
-    // Remove room if empty
+    // If game is running, check if remaining players all went (someone left mid-round)
+    if (gameRoom.status === 'in-progress' && gameRoom.players.size > 0) {
+        if (gameRoom.allPlayersWent()) {
+            gameRoom.status = 'voting';
+            io.to(roomCode).emit('start-voting', { players: gameRoom.getTurnOrderList() });
+        } else {
+            const nextSid = gameRoom.currentTurnSocketId();
+            const nextPlayer = gameRoom.players.get(nextSid);
+            if (nextPlayer) {
+                io.to(roomCode).emit('turn-update', {
+                    currentTurnSocketId: nextSid,
+                    currentTurnUsername: nextPlayer.username
+                });
+            }
+        }
+    }
+
+    // If voting and now everyone has voted, resolve
+    if (gameRoom.status === 'voting' && gameRoom.votes.size >= gameRoom.players.size) {
+        resolveVotes(gameRoom, roomCode);
+    }
+
     if (gameRoom.players.size === 0) {
         activeRooms.delete(roomCode);
         console.log(`Room ${roomCode} removed (empty)`);
     }
-
-    //socket.leave(roomCode);
-    //delete socket.roomCode;
 }
 
 const PORT = process.env.PORT || 4000;

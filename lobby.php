@@ -71,7 +71,7 @@
 
             // Connection events
             socket.on('connect', () => {
-                console.log('✅ Connected to server:', socket.id);
+                console.log('Connected to server:', socket.id);
                 
                 // Join the room
                 socket.emit('join-room', {
@@ -82,7 +82,7 @@
             });
 
             socket.on('connect_error', (error) => {
-                console.error('❌ Connection error:', error);
+                console.error('Connection error:', error);
                 alert('Failed to connect to game server. Please try again.');
             });
 
@@ -97,12 +97,10 @@
 
             // Join events
             socket.on('join-success', (data) => {
-                console.log('✅ Successfully joined room:', data);
-                
+                console.log('Successfully joined room:', data);
                 // Hide loading, show lobby
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('lobby').style.display = 'block';
-                
                 // Update UI
                 document.getElementById('room-code').textContent = data.roomCode;
                 document.getElementById('player-count').textContent = data.players.length;
@@ -115,7 +113,7 @@
             });
 
             socket.on('join-error', (data) => {
-                console.error('❌ Failed to join room:', data);
+                console.error('Failed to join room:', data);
                 alert(data.message);
                 window.location.href = 'join-room.html';
             });
@@ -151,7 +149,7 @@
                 
                 // TODO: Redirect to game page
                 setTimeout(() => {
-                    window.location.href = 'game.html';
+                    window.location.href = 'word-allocation.php';
                 }, 2000);
             });
 
@@ -192,7 +190,7 @@
                 if (confirm('Are you sure you want to leave the room?')) {
                     socket.emit('leave-room');
                     socket.disconnect();
-                    window.location.href = 'main-menu.html';
+                    window.location.href = 'main-menu.php';
                 }
             });
         }
