@@ -129,7 +129,6 @@ h1 {
     display: flex;
     font-size: 40px;
     font-family: 'Dingos Stamp', sans-serif;
-    transition: transform 0.2s;
 }
 
 /* -------------------------- voting phase ---------------- */
@@ -234,93 +233,4 @@ h1 {
 
     box-shadow: 0 6px 0 rgba(0,0,0,0.25);
     background-color: rgb(164, 157, 157);
-}
-
-/* -------------------------- host-room page ---------------- */
-
-body {
-    background-color: #051d64;
-    background-image: url('style-assets/bg-pattern.PNG');
-    background-size: 150% 150%;
-    background-attachment: fixed;
-    animation: moveBackground 20s ease-in-out infinite alternate;
-    margin: 0;
-}
-
-@keyframes moveBackground {
-    0% { background-position: 0% 0%;}
-    100% { background-position: 50% 50%;}
-}
-
-.outer-border {
-    border: 20px solid #ffa601;
-    border-radius: 45px;
-    min-height: 95vh;
-}
-
-.inner-border {
-    border: 17px solid #7778ed;
-    border-radius: 25px;
-    min-height: 92vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 22px;
-    box-shadow: inset 0 0 20px  rgba(0, 0, 0, 0.501);
-}
-
-/* -------------------------- host-room & join-room pages ---------------- */
-
-.host-container {
-    background-color: #ffa601;
-    width: 525px;
-    border: 5px solid #b57600;
-    border-radius: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    box-shadow: 15px 18px rgba(0, 0, 0, 0.382);
-    padding: 30px 25px;
-    gap: 15px;
-}
-
-.host-container p {
-    color: white;
-    margin: 0;
-    font-size: 60px;
-    font-family: 'Dingos Stamp', sans-serif;
-}
-
-.submit-button:hover {
-transform: scale(1.05); 
-}
-.submit-button:active {
-transform: scale(0.98);
-}
-
-.btn-container {
-display: flex;
-justify-content: space-between;
-height: 110px;
-gap: 40px;
-padding-top: 20px;
-}
-
-#start-btn {
-    background-color: #ff5d83;
-    border: 5px solid whitesmoke;
-    box-shadow: 10px 10px rgba(237, 83, 0, 0.382);
-}
-#back-btn {
-    background-color: #7778ed;
-    border: 5px solid whitesmoke;
-    box-shadow: 10px 10px rgba(237, 83, 0, 0.382);
-}
-
-#submit {
-    background-color: #ff5d83;
-    border: 5px solid whitesmoke;
-    box-shadow: 10px 10px rgba(237, 83, 0, 0.382);
 }
