@@ -43,6 +43,8 @@ class GameRoom {
 
         // Voting
         this.votes = new Map();         // voterSocketId -> votedSocketId
+        // Timer
+        this.turnTimer = null;   // turn timer handle so it can be cleared at any point
     }
 
     addPlayer(socketId, playerData) {
@@ -115,6 +117,76 @@ async function fetchWordFromPHP() {
         return null;
     }
 }
+
+// ── ADDED: Turn timer helper ───────────────────────────────────────────────────
+// Starts a 30-second countdown for the current player's turn.
+// If they don't submit in time, their turn is skipped and the next player goes.
+const TURN_TIME_MS = 30000;
+
+function startTurnTimer(gameRoom, roomCode) {
+    // Clear any existing timer first
+    if (gameRoom.turnTimer) clearTimeout(gameRoom.turnTimer);
+
+    const currentSid = gameRoom.currentTurnSocketId();
+    if (!currentSid) return;
+
+    // Tell all clients when this turn's deadline is so they can count down
+    io.to(roomCode).emit('turn-timer-start', {
+        durationMs: TURN_TIME_MS,
+        currentTurnSocketId: currentSid
+    });
+
+    gameRoom.turnTimer = setTimeout(() => {
+        // Double-check the same player is still up (could have disconnected)
+        if (gameRoom.currentTurnSocketId() !== currentSid) return;
+        if (gameRoom.status !== 'in-progress') return;
+
+        const timedOutPlayer = gameRoom.players.get(currentSid);
+        const username = timedOutPlayer?.username ?? 'Unknown';
+
+        // Notify room that this player ran out of time
+        io.to(roomCode).emit('chat-message', {
+            username: '⏰ Timer',
+            message: `${username} ran out of time and was skipped!`,
+            timestamp: Date.now(),
+            isSystem: true
+        });
+
+        // Advance turn just like a normal submission
+        gameRoom.advanceTurn();
+
+        if (gameRoom.allPlayersWent()) {
+            gameRoom.status = 'voting';
+            io.to(roomCode).emit('chat-message', {
+                username: '🎮 Game',
+                message: 'Everyone has spoken. Time to vote!',
+                timestamp: Date.now(),
+                isSystem: true
+            });
+            io.to(roomCode).emit('start-voting', { players: gameRoom.getTurnOrderList() });
+            return;
+        }
+
+        const nextSid = gameRoom.currentTurnSocketId();
+        const nextPlayer = gameRoom.players.get(nextSid);
+
+        io.to(roomCode).emit('chat-message', {
+            username: '🎮 Game',
+            message: `${nextPlayer.username}'s turn!`,
+            timestamp: Date.now(),
+            isSystem: true
+        });
+
+        io.to(roomCode).emit('turn-update', {
+            currentTurnSocketId: nextSid,
+            currentTurnUsername: nextPlayer.username
+        });
+
+        // Start the timer for the next player
+        startTurnTimer(gameRoom, roomCode);
+    }, TURN_TIME_MS);
+}
+// ────────────────────────────────────────────────────────────────────
 
 // ── SOCKET EVENTS ─────────────────────────────────────────────────────────────
 
@@ -287,6 +359,10 @@ io.on('connection', (socket) => {
                 currentTurnUsername: firstPlayer.username
             });
 
+            // ── ADDED: kick off the first player's 30-second timer ──
+            startTurnTimer(gameRoom, roomCode);
+       
+
             console.log(`Game started in ${roomCode}. Imposter: ${gameRoom.players.get(imposterSocketId).username}. Word: ${word}`);
 
         } catch (error) {
@@ -310,6 +386,19 @@ io.on('connection', (socket) => {
             if (gameRoom.currentTurnSocketId() !== socket.id) {
                 socket.emit('chat-error', { message: "It's not your turn!" });
                 return;
+            }
+
+            // ── ADDED: server-side character limit enforcement ──
+            if (typeof message !== 'string' || message.trim().length === 0) return;
+            if (message.length > 128) {
+                socket.emit('chat-error', { message: 'Your message exceeds the 128 character limit.' });
+                return;
+            }
+
+            // ── ADDED: clear the running timer since this player submitted in time ──
+            if (gameRoom.turnTimer) {
+                clearTimeout(gameRoom.turnTimer);
+                gameRoom.turnTimer = null;
             }
 
             // Broadcast the message
@@ -355,6 +444,9 @@ io.on('connection', (socket) => {
                 currentTurnSocketId: nextSid,
                 currentTurnUsername: nextPlayer.username
             });
+
+            // ── ADDED: start the next player's 30-second timer ──
+            startTurnTimer(gameRoom, roomCode);
 
         } else {
             // Lobby free chat
@@ -448,6 +540,13 @@ function handlePlayerLeave(socket) {
 
     const player = gameRoom.players.get(socket.id);
 
+    // ── ADDED: if the disconnecting player was the active one, clear their timer ──
+    if (gameRoom.currentTurnSocketId() === socket.id && gameRoom.turnTimer) {
+        clearTimeout(gameRoom.turnTimer);
+        gameRoom.turnTimer = null;
+    }
+    
+
     // Remove from turn order
     const turnIdx = gameRoom.turnOrder.indexOf(socket.id);
     if (turnIdx !== -1) {
@@ -482,6 +581,9 @@ function handlePlayerLeave(socket) {
                     currentTurnSocketId: nextSid,
                     currentTurnUsername: nextPlayer.username
                 });
+                // ── ADDED: restart timer for the next player after a disconnect ──
+                startTurnTimer(gameRoom, roomCode);
+                
             }
         }
     }

@@ -24,9 +24,20 @@
 
         <div id="chat-area">
             <div id="turn-indicator"></div>
+
+            <div id="timer-bar-container">
+                <div id="timer-label">Time remaining: <span id="timer-seconds">30</span>s</div>
+                <div id="timer-bar-track">
+                    <div id="timer-bar-fill"></div>
+                </div>
+            </div>
+
             <div id="chat-messages"></div>
-            <input type="text" id="chat-input" placeholder="Type your word..." disabled>
+            <input type="text" id="chat-input" placeholder="Type your word..." disabled maxlength="128">
             <button id="send-btn" disabled>Send</button>
+
+            <div id="char-counter">0 / 128</div>
+            <div id="chat-messages"></div>  <!-- this is for css -->
         </div>
 
     </div>
@@ -174,6 +185,40 @@
                 updateTurnList(data.players);
             });
 
+            // timer
+            let timerInterval = null; // holds the setInterval so we can clear it
+
+            socket.on('turn-timer-start', (data) => {
+                const secs = data.durationMs / 1000;
+                const fill = document.getElementById('timer-bar-fill');
+                const label = document.getElementById('timer-seconds');
+                const container = document.getElementById('timer-bar-container');
+
+                // Reset to full instantly (no transition)
+                fill.style.transition = 'none';
+                fill.style.width = '100%';
+                fill.style.background = '#4caf50';
+                label.textContent = secs;
+
+                // Force a reflow so the reset takes effect before the transition starts
+                fill.offsetWidth;
+
+                // Now set the transition and animate to 0 over the full duration
+                fill.style.transition = `width ${secs}s linear, background ${secs}s linear`;
+                fill.style.width = '0%';
+                fill.style.background = '#e53935';
+
+                // Only thing still needing JS: tick the seconds label
+                let remaining = secs;
+                const interval = setInterval(() => {
+                    remaining--;
+                    label.textContent = Math.max(0, remaining);
+                    if (remaining <= 0) {
+                        clearInterval(interval);
+                        container.style.display = 'none';
+                    }
+                }, 1000); // only fires once per second instead of 4×
+            });
             setupListeners();
         }
 
@@ -192,14 +237,34 @@
             document.getElementById('back-to-menu-btn').addEventListener('click', () => {
                 window.location.href = 'main-menu.html';
             });
+
+            // update the char counter while user types
+            document.getElementById('chat-input').addEventListener('input', () => {
+                const input = document.getElementById('chat-input');
+                const counter = document.getElementById('char-counter');
+                const len = input.value.length;
+                counter.textContent = `${len} / 128`;
+                // Turn the counter red when at or over the limit
+                counter.classList.toggle('over-limit', len >= 128);
+            });
         }
 
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const msg = input.value.trim();
+
+            if (msg.length > 128) {
+                appendMessage('Message too long (max 128 characters).', true);
+                return;
+            }
+
             if (msg) {
                 socket.emit('chat-message', msg);
                 input.value = '';
+
+                const counter = document.getElementById('char-counter'); //reset the char counter after sending ══
+                counter.textContent = '0 / 128';
+                counter.classList.remove('over-limit');
             }
         }
 
