@@ -98,7 +98,7 @@
                     // Currently it is just set up to noun, which may be a limitation
                     // work on range
                     $parameters = array($cat_id);
-                    $result = selectFunction($connection, "*", "words", "", "category_id = ?", $parameters);
+                    $result = selectFunction($connection, "*", "words", "", "category_id = ? ORDER BY RAND() LIMIT 1", $parameters);
                     // if the result was not found
                     if (!$result || mysqli_num_rows($result) <= 0){
                         $attempt_count++;
