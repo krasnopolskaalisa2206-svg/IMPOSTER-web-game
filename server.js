@@ -230,9 +230,29 @@ io.on('connection', (socket) => {
             }
 
             gameRoom.addPlayer(socket.id, { playerId, username, socketId: socket.id });
+            // If rejoining mid-game, replace old socketId in turnOrder
+            if (gameRoom.gameData) {
+                const oldSid = gameRoom.turnOrder.find(sid => 
+                    gameRoom.players.get(sid)?.playerId === playerId && sid !== socket.id);
+
+                console.log('=== REJOIN DEBUG ===');
+                console.log('turnOrder:', gameRoom.turnOrder);
+                console.log('players map keys:', [...gameRoom.players.keys()]);
+                console.log('getTurnOrderList():', gameRoom.getTurnOrderList());
+                console.log('gameData:', gameRoom.gameData);
+                console.log('===================');
+                if (oldSid) {
+                    const idx = gameRoom.turnOrder.indexOf(oldSid);
+                    if (idx !== -1) gameRoom.turnOrder[idx] = socket.id;
+                    gameRoom.players.delete(oldSid);
+                    if (gameRoom.gameData.imposterSocketId === oldSid) {
+                        gameRoom.gameData.imposterSocketId = socket.id;
+                    }
+                }
+            }
+
             socket.join(roomCode);
             socket.roomCode = roomCode;
-
             socket.emit('join-success', {
                 roomCode,
                 roomId,
@@ -247,7 +267,8 @@ io.on('connection', (socket) => {
             });
 
             // If game already in progress (player rejoining game.php), resend their data
-            if (gameRoom.status === 'in-progress' && gameRoom.gameData) {
+            console.log(`Rejoin check — status: ${gameRoom.status}, hasGameData: ${!!gameRoom.gameData}`);
+            if (gameRoom.gameData) {
                 const { word, category, imposterSocketId } = gameRoom.gameData;
                 const isImposter = socket.id === imposterSocketId;
                 socket.emit('game-data', {
@@ -255,12 +276,18 @@ io.on('connection', (socket) => {
                     category,
                     word: isImposter ? null : word
                 });
+
                 socket.emit('turn-order', { players: gameRoom.getTurnOrderList() });
+                socket.emit('game-data', {
+                    isImposter: socket.id === gameRoom.gameData.imposterSocketId,
+                    category: gameRoom.gameData.category,
+                    word: socket.id === gameRoom.gameData.imposterSocketId ? null : gameRoom.gameData.word
+                });
 
                 const currentSid = gameRoom.currentTurnSocketId();
                 const currentPlayer = gameRoom.players.get(currentSid);
                 if (currentPlayer) {
-                    io.to(roomCode).emit('turn-update', {
+                    socket.emit('turn-update', {
                         currentTurnSocketId: currentSid,
                         currentTurnUsername: currentPlayer.username
                     });
@@ -322,14 +349,8 @@ io.on('connection', (socket) => {
                 ['in-progress', roomCode]
             );
 
-            // Tell everyone to go to game.php
-            io.to(roomCode).emit('game-started', {
-                message: 'Game is starting!',
-                players: gameRoom.getPlayerList()
-            });
-
             // Send role data privately to each player
-            for (const [sid] of gameRoom.players) {
+            for (const [sid, player] of gameRoom.players) {
                 const isImposter = sid === imposterSocketId;
                 io.to(sid).emit('game-data', {
                     isImposter,
@@ -342,6 +363,10 @@ io.on('connection', (socket) => {
             io.to(roomCode).emit('turn-order', {
                 players: gameRoom.getTurnOrderList()
             });
+
+            // Tell everyone game is starting (once)
+            io.to(roomCode).emit('game-started', { message: 'Game is starting!' });
+
 
             // Announce first turn
             const firstSid = gameRoom.currentTurnSocketId();
@@ -434,7 +459,7 @@ io.on('connection', (socket) => {
             const nextPlayer = gameRoom.players.get(nextSid);
 
             io.to(roomCode).emit('chat-message', {
-                username: '🎮 Game',
+                username: 'Game',
                 message: `${nextPlayer.username}'s turn!`,
                 timestamp: Date.now(),
                 isSystem: true
@@ -479,6 +504,37 @@ io.on('connection', (socket) => {
         }
     });
 
+    // ── ROUND CONTINUE ───────────────────────────────────────
+    socket.on('round-continue', () => {
+        const roomCode = socket.roomCode;
+        const gameRoom = activeRooms.get(roomCode);
+        if (!gameRoom || gameRoom.hostId !== socket.id) return;
+
+        // Reset turn tracking but keep same order
+        gameRoom.playersWhoWent = new Set();
+        gameRoom.currentTurnIndex = 0;
+        gameRoom.status = 'in-progress';
+
+        io.to(roomCode).emit('round-continue', { players: gameRoom.getTurnOrderList() });
+
+        const firstSid = gameRoom.currentTurnSocketId();
+        const firstPlayer = gameRoom.players.get(firstSid);
+        io.to(roomCode).emit('turn-update', {
+            currentTurnSocketId: firstSid,
+            currentTurnUsername: firstPlayer.username
+        });
+        startTurnTimer(gameRoom, roomCode);
+    });
+
+    // ── REQUEST VOTING ───────────────────────────────────────
+    socket.on('request-voting', () => {
+        const roomCode = socket.roomCode;
+        const gameRoom = activeRooms.get(roomCode);
+        if (!gameRoom || gameRoom.hostId !== socket.id) return;
+
+        gameRoom.status = 'voting';
+        io.to(roomCode).emit('go-to-voting', { players: gameRoom.getTurnOrderList() });
+    });
     // ── DISCONNECT ───────────────────────────────────────
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
