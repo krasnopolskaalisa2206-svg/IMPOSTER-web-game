@@ -625,7 +625,7 @@ function resetRoom(gameRoom) {
 }
 
 // ── PLAYER LEAVE ──────────────────────────────────────────────────────────────
-function handlePlayerLeave(socket) {
+async function handlePlayerLeave(socket) {
     const roomCode = socket.roomCode;
     if (!roomCode) return;
 
@@ -691,6 +691,27 @@ function handlePlayerLeave(socket) {
         activeRooms.delete(roomCode);
         console.log(`Room ${roomCode} removed (empty)`);
     }
+
+    if (gameRoom.players.size === 0) {
+        activeRooms.delete(roomCode);
+        console.log(`Room ${roomCode} removed (empty)`);
+        await pool.query(
+            'DELETE FROM rooms WHERE room_code = ?',
+            [roomCode]
+        );
+    }
+
+    if (player) {
+    try {
+        await pool.query(
+            'DELETE FROM player_session WHERE player_id = ? AND room_id = ?',
+            [player.playerId, gameRoom.roomId]
+        );
+        } catch (err) {
+        console.error('Failed to delete player from database:', err);
+        }
+    }
+
 }
 
 const PORT = process.env.PORT || 4000;
