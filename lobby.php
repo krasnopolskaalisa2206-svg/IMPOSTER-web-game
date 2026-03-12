@@ -230,6 +230,7 @@ function connectSocket(session) {
         isHost = data.isHost;
         document.getElementById('room-code').textContent = data.roomCode;
         document.getElementById('player-count').textContent = data.players.length;
+        allPlayers = data.players;
         updatePlayerList(data.players);
         if (data.isHost) document.getElementById('host-controls').style.display = 'block';
         showScreen('screen-lobby');
@@ -241,6 +242,7 @@ function connectSocket(session) {
     });
 
     socket.on('player-joined', (data) => {
+        allPlayers = data.players;
         updatePlayerList(data.players);
         document.getElementById('player-count').textContent = data.playerCount;
         notify(`${data.player.username} joined`);
@@ -248,6 +250,7 @@ function connectSocket(session) {
 
     socket.on('player-left', (data) => {
         if (data.players) {
+            allPlayers = data.players;
             updatePlayerList(data.players);
             document.getElementById('player-count').textContent = data.playerCount;
         }

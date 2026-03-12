@@ -30,51 +30,6 @@ body {
     box-shadow: inset 0 0 20px  rgba(0, 0, 0, 0.501);
 }
 
-/* ----------------------- home page ------------------------------ */
-
-
-.home-button {
-    background-color: #ffa601;
-    color: white;
-    cursor: pointer;
-    justify-content: flex-start;
-    gap: 20px;
-    align-items: center;
-    border-radius: 60px;
-    height: 150px;
-    width: 400px;
-    display: flex;
-    font-size: 60px;
-    font-family: 'Dingos Stamp', sans-serif;
-    box-shadow: 5px 18px rgba(0, 0, 0, 0.382); 
-    transition: transform 0.2s;
-}
-
-.home-button:hover {
-transform: scale(1.05); 
-}
-.home-button:active {
-transform: scale(0.98);
-}
-#register-btn {
-    border: 5px solid #7778ed;
-}
-#login-btn {
-    border: 5px solid #ff5d83;
-}
-
-@font-face {
-    font-family: 'Dingos Stamp';
-    src: url('style-assets/DCC\ -\ Bushido.ttf') format('truetype');
-}
-
-.home-icon {
-    width: 105px;
-    height: 105px;
-    object-fit: contain;
-    background: transparent;
-    border: none;
-}
 
 /* -------------------------- register and login pages ---------------- */
 
@@ -168,17 +123,19 @@ body {
 
 /* ----------------------- home page ------------------------------ */
 
+
 .home-button {
     background-color: #ffa601;
     color: white;
     cursor: pointer;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 20px;
     align-items: center;
     border-radius: 60px;
     height: 150px;
     width: 400px;
     display: flex;
-    font-size: 70px;
+    font-size: 60px;
     font-family: 'Dingos Stamp', sans-serif;
     box-shadow: 5px 18px rgba(0, 0, 0, 0.382); 
     transition: transform 0.2s;
@@ -201,6 +158,15 @@ transform: scale(0.98);
     font-family: 'Dingos Stamp';
     src: url('style-assets/DCC\ -\ Bushido.ttf') format('truetype');
 }
+
+.home-icon {
+    width: 105px;
+    height: 105px;
+    object-fit: contain;
+    background: transparent;
+    border: none;
+}
+
 
 /* -------------------------- register and login pages ---------------- */
 

@@ -336,7 +336,7 @@ h1 {
 
 
 #chat {
-    min-height: 92vh;
+    height: 92vh;
     width: 400px;
     background: #f6fafe;
     border-radius: 15px;
@@ -389,6 +389,9 @@ h1 {
     max-width: 85%;
     font-size: 18px;
     font-weight: 100;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .chat-message.green { background: #79c84c; }
