@@ -12,8 +12,12 @@
         <div class="inner-border">
 
             <div class="top-left-buttons">
-                <button class="circle-btn"><img src="style-assets/settings-logo.png" class="logo"></button>
+                <button class="circle-btn" id="settings-btn"><img src="style-assets/settings-logo.png" class="logo"></button>
                 <button class="circle-btn"><img src="style-assets/cosmetics-logo.png" class="logo"></button>
+            </div>
+
+            <div class="settings" id="settings" style="display:none">
+                <button class="go-home-btn" id="go-home-btn">Back to home</button>
             </div>
 
             <div class="button-space">
@@ -38,6 +42,14 @@
         document.getElementById("host-room-btn").addEventListener('click', function() {
             window.location.href="host-room.php";
         });
+
+        document.getElementById("settings-btn").addEventListener('click', function() {
+            document.getElementById("settings").style.display = "block";
+        });
+
+        document.getElementById("go-home-btn").addEventListener('click', function() {
+            window.location.href="home.html";
+        })
 
     </script>
 
