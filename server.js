@@ -43,6 +43,7 @@ class GameRoom {
 
         // Voting
         this.votes = new Map();         // voterSocketId -> votedSocketId
+        this.pendingResult = null;      // stored result data during imposter guess phase
         // Timer
         this.turnTimer = null;   // turn timer handle so it can be cleared at any point
     }
@@ -535,6 +536,29 @@ io.on('connection', (socket) => {
         gameRoom.status = 'voting';
         io.to(roomCode).emit('go-to-voting', { players: gameRoom.getTurnOrderList() });
     });
+
+    // ── IMPOSTER GUESS ───────────────────────────────────
+    socket.on('imposter-guess', ({ guess }) => {
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const gameRoom = activeRooms.get(roomCode);
+        if (!gameRoom || gameRoom.status !== 'guessing') return;
+
+        // Only the imposter can submit a guess
+        if (socket.id !== gameRoom.pendingResult?.imposterSocketId) return;
+
+        const correct = typeof guess === 'string' &&
+            guess.trim().toLowerCase() === gameRoom.pendingResult.word.toLowerCase();
+
+        io.to(roomCode).emit('guess-result', {
+            ...gameRoom.pendingResult,
+            guessCorrect: correct
+        });
+
+        resetRoom(gameRoom);
+    });
+
     // ── DISCONNECT ───────────────────────────────────────
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
@@ -560,7 +584,7 @@ function resolveVotes(gameRoom, roomCode) {
         }
     }
 
-    const { imposterSocketId, word } = gameRoom.gameData;
+    const { imposterSocketId, word, category } = gameRoom.gameData;
     const imposterPlayer = gameRoom.players.get(imposterSocketId);
     const imposterCaught = mostVotedSid === imposterSocketId;
 
@@ -571,19 +595,33 @@ function resolveVotes(gameRoom, roomCode) {
         if (p) voteCountsByName[p.username] = count;
     }
 
-    io.to(roomCode).emit('vote-results', {
+    const resultData = {
         imposterUsername: imposterPlayer?.username ?? 'Unknown',
+        imposterSocketId,
         imposterCaught,
         word,
+        category,
         voteCounts: voteCountsByName
-    });
+    };
 
-    // Reset room status
+    io.to(roomCode).emit('vote-results', resultData);
+
+    if (imposterCaught) {
+        // Don't reset yet — wait for the imposter's word guess
+        gameRoom.pendingResult = resultData;
+        gameRoom.status = 'guessing';
+    } else {
+        resetRoom(gameRoom);
+    }
+}
+
+function resetRoom(gameRoom) {
     gameRoom.status = 'lobby';
     gameRoom.gameData = null;
     gameRoom.turnOrder = [];
     gameRoom.votes = new Map();
     gameRoom.playersWhoWent = new Set();
+    gameRoom.pendingResult = null;
 }
 
 // ── PLAYER LEAVE ──────────────────────────────────────────────────────────────

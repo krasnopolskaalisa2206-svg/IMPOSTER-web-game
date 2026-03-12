@@ -1,325 +1,441 @@
-        @font-face {
-            font-family: 'Dingos Stamp';
-            src: url('style-assets/DCC\ -\ Bushido.ttf') format('truetype');
-        }
-        
-        :root {
-            --red: #ff2d55;
-            --green: #00e5a0;
-            --bg: #0a0a0a;
-            --surface: #141414;
-            --surface2: #1e1e1e;
-            --border: #2a2a2a;
-            --text: #f0f0f0;
-            --muted: #555;
-        }
+@font-face {
+    font-family: 'Dingos Stamp';
+    src: url('style-assets/DCC\ -\ Bushido.ttf') format('truetype');
+}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --orange: #ffa601;
+    --orange-dark: #b57600;
+    --orange-deep: #603d12;
+    --pink: #ff5d83;
+    --purple: #7778ed;
+    --bg-blue: #051d64;
+    --white: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.382);
+    --shadow-orange: rgba(237, 83, 0, 0.382);
+}
 
-        body {
-            font-family: 'DM Mono', monospace;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 24px;
-        }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── SCREENS ── */
-        .screen { display: none; }
-        .screen.active { display: block; }
+body {
+    font-family: 'Dingos Stamp', sans-serif;
+    background-color: var(--bg-blue);
+    background-image: url('style-assets/bg-pattern.PNG');
+    background-size: 150% 150%;
+    background-attachment: fixed;
+    animation: moveBackground 20s ease-in-out infinite alternate;
+    color: var(--white);
+    min-height: 100vh;
+    padding: 0px;
+}
 
-        /* ── SHARED LAYOUT ── */
-        .page { max-width: 860px; margin: 0 auto; }
+@keyframes moveBackground {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 50% 50%; }
+}
 
-        .tag {
-            display: inline-block;
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 6px;
-        }
+/* ── SCREENS ── */
+.screen { display: none; }
+.screen.active { display: block; }
 
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 2.4rem;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 24px;
-        }
+.page { max-width: 860px; margin: 0 auto; flex: 1; }
+.outer-border {
+    border: 20px solid var(--orange);
+    border-radius: 45px;
+    min-height: 98vh;
+}
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
+.inner-border {
+    border: 17px solid var(--purple);
+    border-radius: 25px;
+    min-height: 95vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 22px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.501);
+}
 
-        .card-title {
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 14px;
-        }
+.tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 6px;
+    font-family: 'Dingos Stamp', sans-serif;
+}
 
-        /* ── LOBBY ── */
-        #screen-lobby .room-code-display {
-            font-family: 'Syne', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: 8px;
-            color: var(--red);
-        }
+h1 {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 70px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 24px;
+    color: var(--white);
+    padding-top: 15px;
+}
 
-        #player-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        #player-list li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            background: var(--surface2);
-            border-radius: 10px;
-            font-size: 0.9rem;
-        }
-        #player-list li .dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            flex-shrink: 0;
-        }
-        #player-list li .host-badge {
-            margin-left: auto;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--red);
-            text-transform: uppercase;
-        }
+/* ── CARDS ── */
+.card {
+    background-color: var(--orange);
+    border: 5px solid var(--orange-dark);
+    border-radius: 60px;
+    padding: 30px 25px;
+    margin-bottom: 16px;
+    box-shadow: 15px 18px var(--shadow);
+}
 
-        /* ── BUTTONS ── */
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.15s, transform 0.1s;
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-red { background: var(--red); color: #fff; }
-        .btn-green { background: var(--green); color: #000; }
-        .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-        .btn-full { width: 100%; text-align: center; }
+.card-title {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 14px;
+}
 
-        /* ── LOBBY CHAT ── */
-        #lobby-chat-messages {
-            height: 160px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-        .lobby-msg { font-size: 0.85rem; color: var(--muted); }
-        .lobby-msg strong { color: var(--text); }
+/* ── LOBBY ── */
+#screen-lobby .room-code-display {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: 8px;
+    color: var(--pink);
+    text-shadow: 4px 4px var(--shadow);
+}
 
-        .input-row { display: flex; gap: 8px; }
-        .input-row input, .chat-input-wrap input {
-            flex: 1;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: var(--text);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.85rem;
-            outline: none;
-        }
-        .input-row input:focus, .chat-input-wrap input:focus {
-            border-color: var(--muted);
-        }
+#player-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+#player-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background-color: var(--orange-dark);
+    border: 3px solid var(--orange-deep);
+    border-radius: 40px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1rem;
+    color: var(--white);
+    box-shadow: 5px 5px var(--shadow);
+}
+#player-list li .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--white);
+    flex-shrink: 0;
+}
+#player-list li .host-badge {
+    margin-left: auto;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--bg-blue);
+    text-transform: uppercase;
+    font-family: 'Dingos Stamp', sans-serif;
+}
 
-        /* ── GAME SCREEN ── */
-        #screen-game { display: none; }
-        #screen-game.active { display: block; }
+/* ── BUTTONS ── */
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 24px;
+    height: 80px;
+    border: 5px solid whitesmoke;
+    border-radius: 40px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: var(--white);
+    box-shadow: 10px 10px var(--shadow-orange);
+}
+.btn:hover { transform: scale(1.05); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-red { background-color: var(--pink); border-color: whitesmoke; }
+.btn-green { background-color: var(--purple); border-color: whitesmoke; }
+.btn-ghost { background-color: var(--orange-dark); border-color: var(--orange-deep); }
+.btn-full { width: 100%; }
 
-        /* role box */
-        #role-box {
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-            border: 2px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
-        #role-box.imposter {
-            background: #1a0008;
-            border-color: var(--red);
-        }
-        #role-box.normie {
-            background: #001a0e;
-            border-color: var(--green);
-        }
-        #role-box .role-eyebrow {
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-        #role-box.imposter .role-eyebrow { color: var(--red); }
-        #role-box.normie .role-eyebrow { color: var(--green); }
-        #role-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-        #role-box.imposter #role-label { color: var(--red); }
-        #role-box.normie #role-label { color: var(--green); }
-        #category-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
-        #word-label { font-size: 1.1rem; font-weight: 500; }
+/* ── GAME SCREEN ── */
+#screen-game { display: none; }
+#screen-game.active { display: block; }
 
-        /* turn order */
-        #turn-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-        #turn-list li {
-            padding: 6px 14px;
-            background: var(--surface2);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        #turn-list li.active-turn {
-            border-color: var(--red);
-            background: #1a0008;
-            color: var(--red);
-            font-weight: 700;
-        }
-        #turn-list li.went {
-            opacity: 0.3;
-            text-decoration: line-through;
-        }
+/* role box */
+#role-box {
+    border-radius: 40px;
+    padding: 24px 30px;
+    margin-bottom: 16px;
+    border: 5px solid whitesmoke;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 10px 10px var(--shadow);
+}
+#role-box.imposter {
+    background-color: var(--pink);
+    border-color: #b5003a;
+}
+#role-box.normie {
+    background-color: var(--purple);
+    border-color: #3a3bb5;
+}
+#role-box .role-eyebrow {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: var(--white);
+}
+#role-label {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--white);
+    text-shadow: 4px 4px var(--shadow);
+}
+#category-label { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 4px; font-family: 'Dingos Stamp', sans-serif; }
+#word-label { font-size: 1.4rem; font-family: 'Dingos Stamp', sans-serif; color: var(--white); }
 
-        /* turn indicator */
-        #turn-indicator {
-            padding: 12px 16px;
-            background: var(--surface2);
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: var(--muted);
-            text-align: center;
-            margin-bottom: 12px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        #turn-indicator.your-turn {
-            background: #001a0e;
-            color: var(--green);
-            border-color: var(--green);
-            font-weight: 700;
-        }
+/* turn order */
+#turn-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+#turn-list li {
+    padding: 8px 18px;
+    background-color: var(--orange-dark);
+    border: 3px solid var(--orange-deep);
+    border-radius: 30px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    color: var(--white);
+    box-shadow: 4px 4px var(--shadow);
+}
+#turn-list li.active-turn {
+    border-color: var(--pink);
+    background-color: var(--pink);
+    color: var(--white);
+    font-weight: 700;
+}
+#turn-list li.went {
+    opacity: 0.3;
+    text-decoration: line-through;
+}
 
-        /* game chat */
-        #game-chat-messages {
-            height: 220px;
-            overflow-y: auto;
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-        .chat-msg { font-size: 0.85rem; }
-        .chat-msg strong { color: var(--green); }
-        .system-msg { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+/* turn indicator */
+#turn-indicator {
+    padding: 14px 20px;
+    background-color: var(--orange-dark);
+    border: 5px solid var(--orange-deep);
+    border-radius: 40px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1rem;
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    box-shadow: 5px 5px var(--shadow);
+}
+#turn-indicator.your-turn {
+    background-color: var(--purple);
+    border-color: #3a3bb5;
+    color: var(--white);
+    font-weight: 700;
+}
 
-        .chat-input-wrap { display: flex; gap: 8px; align-items: center; }
-        #char-counter {
-            font-size: 0.7rem;
-            color: var(--muted);
-            text-align: right;
-            margin-top: 4px;
-        }
-        #char-counter.over-limit { color: var(--red); }
+/* round end */
+#round-end-actions {
+    display: none;
+    gap: 12px;
+    margin-top: 4px;
+}
+#round-end-actions.visible { display: flex; }
 
-        /* round end */
-        #round-end-actions {
-            display: none;
-            gap: 12px;
-            margin-top: 4px;
-        }
-        #round-end-actions.visible { display: flex; }
+/* ── VOTING ── */
+#screen-voting { display: none; }
+#screen-voting.active { display: block; }
+#vote-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+#vote-list button {
+    width: 100%;
+    padding: 18px 24px;
+    background-color: var(--orange);
+    border: 5px solid var(--orange-dark);
+    border-radius: 40px;
+    color: var(--white);
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-align: left;
+    box-shadow: 8px 8px var(--shadow);
+}
+#vote-list button:hover:not(:disabled) {
+    transform: scale(1.02);
+    border-color: var(--pink);
+    background-color: var(--pink);
+}
+#vote-list button:active { transform: scale(0.98); }
+#vote-list button:disabled { opacity: 0.4; cursor: not-allowed; }
+#vote-status { font-size: 1rem; color: rgba(255,255,255,0.7); font-family: 'Dingos Stamp', sans-serif; }
 
-        /* ── VOTING ── */
-        #screen-voting { display: none; }
-        #screen-voting.active { display: block; }
-        #vote-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
-        #vote-list button {
-            width: 100%;
-            padding: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: border-color 0.15s, background 0.15s;
-            text-align: left;
-        }
-        #vote-list button:hover:not(:disabled) {
-            border-color: var(--red);
-            background: #1a0008;
-        }
-        #vote-list button:disabled { opacity: 0.4; cursor: not-allowed; }
-        #vote-status { font-size: 0.85rem; color: var(--muted); }
+/* ── RESULTS ── */
+#screen-results { display: none; }
+#screen-results.active { display: block; }
+.result-hero {
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 16px 0 8px;
+    text-shadow: 5px 5px var(--shadow);
+}
+.result-hero.win { color: var(--orange); }
+.result-hero.lose { color: var(--pink); }
+#vote-breakdown-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+#vote-breakdown-list li {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1rem;
+    padding: 12px 20px;
+    background-color: var(--orange-dark);
+    border: 3px solid var(--orange-deep);
+    border-radius: 30px;
+    color: var(--white);
+    box-shadow: 5px 5px var(--shadow);
+}
 
-        /* ── RESULTS ── */
-        #screen-results { display: none; }
-        #screen-results.active { display: block; }
-        .result-hero {
-            font-family: 'Syne', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 16px 0 8px;
-        }
-        .result-hero.win { color: var(--green); }
-        .result-hero.lose { color: var(--red); }
-        #vote-breakdown-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        #vote-breakdown-list li {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            padding: 8px 12px;
-            background: var(--surface2);
-            border-radius: 8px;
-        }
+/* ── NOTIFICATION ── */
+.notif {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--orange);
+    border: 5px solid var(--orange-dark);
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1.2rem;
+    color: var(--white);
+    box-shadow: 8px 8px var(--shadow);
+    animation: fadeup 0.3s ease, fadeout 0.3s ease 2.7s forwards;
+    z-index: 999;
+}
+@keyframes fadeup {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes fadeout {
+    to { opacity: 0; }
+}
 
-        /* notification */
-        .notif {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 0.85rem;
-            animation: fadeup 0.3s ease, fadeout 0.3s ease 2.7s forwards;
-            z-index: 999;
-        }
-        @keyframes fadeup {
-            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        @keyframes fadeout {
-            to { opacity: 0; }
-        }
+/* -------------------------- shared chat ---------------- */
+
+
+#chat {
+    min-height: 92vh;
+    width: 400px;
+    background: #f6fafe;
+    border-radius: 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    border: 6px solid rgb(0, 0, 41);
+}
+
+#chat h3 {
+    display: none;
+}
+
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    justify-content: flex-start;
+}
+
+#chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #bec6d4;
+    border: 3px solid rgb(0, 0, 41);
+    border-radius: 10px;
+}
+
+.chat-message.system {
+    align-self: center;
+    background: #004e7a;
+    color: white;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 14px;
+    max-width: 90%;
+}
+
+.chat-message {
+    align-self: flex-start;
+    color: white;
+    border: 3px solid rgb(0, 0, 41);
+    padding: 6px 12px;
+    border-radius: 16px;
+    max-width: 85%;
+    font-size: 18px;
+    font-weight: 100;
+}
+
+.chat-message.green { background: #79c84c; }
+.chat-message.red   { background: #df3f64; }
+.chat-message.blue  { background: rgb(17, 137, 218); }
+.chat-message.pink  { background: #c83488; }
+.chat-message.orange{ background: #ed7f02; }
+.chat-message.purple{ background: #696be2;}
+.chat-message.brown { background:rgb(165, 108, 42);}
+
+#chat-input {
+    border: none;
+    border-radius: 14px;
+    padding: 10px;
+    background: #e5e7eb;
+    font-size: 14px;
+    outline: none;
+    margin-top: 6px;
+    height: 40px;
+}
+
+#chat-input::placeholder {
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+/* SEND BUTTON */
+#send-chat-btn {
+    display: none; 
+}
+
+.chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.chat-username {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(112, 112, 112);
+    margin-left: 6px;
+}
+/* ── phase-specific chat placement ── */
+
+.phase-lobby    #chat { top: 0; right: 0; }
+.phase-game     #chat { top: 0; right: 0; }
+.phase-voting   #chat { bottom: 0; right: 0; }
+.phase-results  #chat { top: 0; left: 0; }
