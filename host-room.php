@@ -1,7 +1,7 @@
 <?php
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//ini_set('display_errors', 1);
 
 //echo "Step 1: Start<br>";
 require_once "includes/system.dbh.inc.php";
@@ -37,7 +37,6 @@ $room_name = $room['name'] ?? 'Room';
 
                     <form action = "includes/host-room.inc.php" method = "POST">
                         <input type = "text" class="input-field" id = "room_name" placeholder="- - - - - - - - - - - - -" name = "room_name" required>
-                        <input type="text" name="room_id" value="<?php echo $_SESSION['room_id']; ?>">
 
                         <div class="btn-container">
                             <button type="button" class="submit-button" id="back-btn"> BACK </button>
