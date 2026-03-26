@@ -119,6 +119,21 @@ async function fetchWordFromPHP() {
     }
 }
 
+async function profanityCheck(message) {
+    try {
+        const res = await fetch('https://vector.profanity.dev', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+        });
+        const data = await res.json();
+        return data.isProfanity === true;
+    } catch (e) {
+        console.log("Profanity API error:", e);
+        return false;
+    }
+}
+
 // ── ADDED: Turn timer helper ───────────────────────────────────────────────────
 // Starts a 30-second countdown for the current player's turn.
 // If they don't submit in time, their turn is skipped and the next player goes.
@@ -193,6 +208,7 @@ function startTurnTimer(gameRoom, roomCode) {
 
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
+    console.log('New client connected as well:', socket.id);
 
     // ── JOIN ROOM ────────────────────────────────────────
     socket.on('join-room', async (data) => {
@@ -398,7 +414,7 @@ io.on('connection', (socket) => {
     });
 
     // ── CHAT MESSAGE ─────────────────────────────────────
-    socket.on('chat-message', (message) => {
+    socket.on('chat-message',async (message) => {
         const roomCode = socket.roomCode;
         if (!roomCode) return;
 
@@ -407,12 +423,24 @@ io.on('connection', (socket) => {
 
         const player = gameRoom.players.get(socket.id);
 
+        console.log("profanity checker triggerred")
+        if (await profanityCheck(message)) {
+            console.log("profanity checker triggerred")
+            // Replace any non-spaces in the entire word (globally)
+            message = message.replace(/\S/g, "*");
+        } 
+
         if (gameRoom.status === 'in-progress') {
             // Enforce turn
             if (gameRoom.currentTurnSocketId() !== socket.id) {
                 socket.emit('chat-error', { message: "It's not your turn!" });
                 return;
             }
+            
+            if (await profanityCheck(message)) {
+                // Replace any non-spaces in the entire word (globally)
+                message = message.replace(/\S/g, "*");
+            } 
 
             // ── ADDED: server-side character limit enforcement ──
             if (typeof message !== 'string' || message.trim().length === 0) return;
