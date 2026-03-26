@@ -299,7 +299,7 @@ function connectSocket(session) {
 
     socket.on('chat-message', (data) => {
         newNotification.currentTime = 0
-        newNotification.play()
+        textMessage.play()
         const isSystem = !!data.isSystem;
         appendChatMessage(isSystem ? null : data.username, data.message, isSystem);
         if (!isSystem && currentPhase === 'game') {
@@ -433,6 +433,8 @@ function resetWentMarks() {
 }
 
 function updateTurnIndicator(currentSocketId, currentUsername) {
+    newNotification.currentTime = 0
+    newNotification.play()
     const indicator = document.getElementById('turn-indicator');
     const chatInput = document.getElementById('chat-input');
 
