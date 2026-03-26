@@ -6,6 +6,7 @@
     <title>Imposter</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <link rel="stylesheet" href="lobby-style.css">
+    <script src="sfxmanager.js"></script>
 </head>
 <body class="phase-lobby">
 
@@ -297,6 +298,8 @@ function connectSocket(session) {
     });
 
     socket.on('chat-message', (data) => {
+        newNotification.currentTime = 0
+        newNotification.play()
         const isSystem = !!data.isSystem;
         appendChatMessage(isSystem ? null : data.username, data.message, isSystem);
         if (!isSystem && currentPhase === 'game') {

@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="home-style.css">
+    <script src="sfxmanager.js"></script>
     <title>Imposter</title>
 </head>
 <body>

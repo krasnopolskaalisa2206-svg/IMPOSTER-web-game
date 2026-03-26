@@ -28,6 +28,7 @@ $room_name = $room['name'] ?? 'Room';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imposter</title>
     <link rel =  "stylesheet" href="home-style.css">
+    <script src="sfxmanager.js"></script>
 </head>
 <body>
         <div class="outer-border">
