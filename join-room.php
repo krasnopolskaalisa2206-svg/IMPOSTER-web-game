@@ -78,7 +78,7 @@
                 } catch (parseError) {
                     console.error('Failed to parse JSON:', parseError);
                     console.error('Response was:', text);
-                    throw new Error('Server returned invalid response. Check console for details.');
+                    throw new Error('Invalid Response: Room does not accept any more players or does not exist.');
                 }
                 
                 if (data.validated) {

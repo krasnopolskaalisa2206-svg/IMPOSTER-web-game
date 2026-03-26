@@ -67,8 +67,8 @@
                     <div id="char-counter">0 / 64</div>
                 </div>
                 <div id="round-end-actions">
-                    <button class="btn btn-green" id="continue-btn" style="flex:1">🔄 Keep Discussing</button>
-                    <button class="btn btn-red" id="vote-btn" style="flex:1">🗳️ Start Voting</button>
+                    <button class="btn btn-green" id="continue-btn" style="flex:1">Keep Discussing</button>
+                    <button class="btn btn-red" id="vote-btn" style="flex:1">Start Voting</button>
                 </div>
             </div>
         </div>
@@ -307,7 +307,7 @@ function connectSocket(session) {
         }
     });
 
-    socket.on('chat-error', (data) => appendChatMessage('⚠️', data.message, true));
+    socket.on('chat-error', (data) => appendChatMessage(data.message, true));
 
     socket.on('start-voting', (data) => {
         allPlayers = data.players;
@@ -459,6 +459,8 @@ function showRoundEndActions(players) {
     if (!isHost) {
         document.getElementById('continue-btn').disabled = true;
         document.getElementById('vote-btn').disabled = true;
+        document.getElementById('vote-btn').style.display = 'none';
+        document.getElementById('continue-btn').style.display = 'none';
         appendChatMessage(null, 'Waiting for host to decide...', true);
     } else {
         appendChatMessage(null, 'Keep discussing or start voting?', true);
@@ -469,6 +471,8 @@ function hideRoundEndActions() {
     document.getElementById('round-end-actions').classList.remove('visible');
     document.getElementById('continue-btn').disabled = false;
     document.getElementById('vote-btn').disabled = false;
+    document.getElementById('continue-btn').textContent = 'Keep Discussing';
+    document.getElementById('vote-btn').textContent = 'Start Voting';
 }
 
 // ── VOTING ────────────────────────────────────────────────────────
@@ -522,7 +526,7 @@ function showResultsScreen(data) {
     } else if (guessCorrect) {
         outcomeText = 'Imposter Wins! (Guessed correctly)';
     } else {
-        outcomeText = 'Innocents Win!';
+        outcomeText = 'Normies Win!';
     }
 
     const imposterWon = !caught || guessCorrect;
