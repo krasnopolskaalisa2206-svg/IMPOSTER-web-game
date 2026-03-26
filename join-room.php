@@ -7,6 +7,7 @@
     <script src="includes/JS/scripts.js"></script>
     <title>Imposter</title>
     <link rel =  "stylesheet" href="home-style.css">
+    <script src="sfxmanager.js"></script>
 </head>
 <body>
         <div class="outer-border">
