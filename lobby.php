@@ -9,7 +9,7 @@
     <script src="sfxmanager.js"></script>
 </head>
 <body class="phase-lobby">
-
+<audio src="sfx/background_music.mp3" autoplay loop></audio>
 <!-- LOBBY -->
 <div id="screen-lobby" class="screen">
     <div class="outer-border">
