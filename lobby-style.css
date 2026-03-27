@@ -218,6 +218,40 @@ h1 {
 #category-label { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 4px; font-family: 'Dingos Stamp', sans-serif; }
 #word-label { font-size: 1.4rem; font-family: 'Dingos Stamp', sans-serif; color: var(--white); }
 
+/* timer */
+
+#timer-bar-container {
+    width: 100%;
+    height: 50px;
+    background-color: black;   
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+#timer-bar {
+    height: 100%;
+    width: 100%; /* starts full */
+    background-color: var(--purple); /* filled part */
+    transition: none;
+    position: relative;
+    z-index: 1;
+
+}
+
+#timer-text {
+    font-size: 2rem;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 50px;
+    font-family: 'Dingos Stamp', sans-serif;
+    font-size: 1.5rem;
+    color: var(--white);
+    pointer-events: none;
+    z-index: 5;
+}
+
 /* turn order */
 #turn-list { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
 #turn-list li {

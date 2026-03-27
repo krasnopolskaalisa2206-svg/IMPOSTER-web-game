@@ -70,6 +70,13 @@
                     <button class="btn btn-green" id="continue-btn" style="flex:1">Keep Discussing</button>
                     <button class="btn btn-red" id="vote-btn" style="flex:1">Start Voting</button>
                 </div>
+                <div class="card" id="timer-card">
+                    <div class="card-title">Timer</div>
+                    <div id="timer-bar-container">
+                        <div id="timer-bar"></div>
+                        <span id="timer-text">0:30</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -208,6 +215,9 @@ async function init() {
 
 // ── SOCKET ────────────────────────────────────────────────────────
 function connectSocket(session) {
+
+    let turnTimerInterval = null;
+
     socket = io('http://localhost:4000', {
         transports: ['websocket', 'polling'],
         reconnection: true,
@@ -224,7 +234,41 @@ function connectSocket(session) {
         });
     });
 
-    socket.on('connect_error', () => alert('Lost connection to server.'));
+    socket.on('connect_error', () => {alert('Lost connection to server.');
+    });
+
+    socket.on('turn-timer-start', (data) => {
+        const timerCard = document.getElementById('timer-card');
+        if (timerCard) timerCard.style.display = 'block';
+
+        const endTime = Date.now() + data.durationMs;
+
+        if (turnTimerInterval) clearInterval(turnTimerInterval);
+
+        turnTimerInterval = setInterval(() => {
+            const bar = document.getElementById('timer-bar');
+            const text = document.getElementById('timer-text');
+
+            if (!bar || !text) return;
+
+            const timeLeftMs = endTime - Date.now();
+            const timeLeft = Math.max(0, Math.ceil(timeLeftMs / 1000));
+
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+
+            text.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            const percent = Math.max(0, (timeLeftMs / data.durationMs) * 100);
+            bar.style.width = percent + "%";
+
+            if (timeLeftMs <= 0) {
+                clearInterval(turnTimerInterval);
+            }
+
+        }, 50);
+    });
+
 
     // ── LOBBY EVENTS ──────────────────────────────────────────────
     socket.on('join-success', (data) => {
@@ -457,6 +501,8 @@ function showRoundEndActions(players) {
     document.getElementById('turn-indicator').textContent = 'Everyone has spoken!';
     document.getElementById('turn-indicator').className = '';
     document.getElementById('round-end-actions').classList.add('visible');
+    const timerCard = document.getElementById('timer-card');
+    if (timerCard) timerCard.style.display = 'none';
 
     if (!isHost) {
         document.getElementById('continue-btn').disabled = true;
@@ -479,6 +525,8 @@ function hideRoundEndActions() {
 
 // ── VOTING ────────────────────────────────────────────────────────
 function showVotingScreen(players) {
+    const timerCard = document.getElementById('timer-card');
+    if (timerCard) timerCard.style.display = 'none';
     showScreen('screen-voting');
     const list = document.getElementById('vote-list');
     list.innerHTML = '';
