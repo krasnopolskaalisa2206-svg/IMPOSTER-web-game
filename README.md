@@ -6,8 +6,8 @@ Welcome to the official repository for our 1st Year Computer Science Group Proje
 
 ## 📸 Preview & Demo
 
-<img src="style_assets/gif_reg_log.MOV" alt="Registration and Login Buttons" width="100%">
-<img src="style_assets/Main_Page.MOV" alt="Main Page" width="100%">
+<img src="style-assets/gif_reg_log.MOV" alt="Registration and Login Buttons" width="100%">
+<img src="style-assets/Main_Page.MOV" alt="Main Page" width="100%">
 
 ---
 
@@ -29,7 +29,7 @@ Welcome to the official repository for our 1st Year Computer Science Group Proje
 
 The project utilizes a hybrid architecture built on **PHP** for core user authentication, **Node.js + WebSockets** for real-time multiplayer communications, and **MySQL** for structured data persistence.
 
-<img src="style_assets/architecture.png" alt="System Architecture Diagram" width="100%">
+<img src="style-assets/architecture.png" alt="System Architecture Diagram" width="100%">
 
 ### Core Game Workflow
 
@@ -48,7 +48,7 @@ The project utilizes a hybrid architecture built on **PHP** for core user authen
 
 The navigation diagram below illustrates the complete player journey through registration, lobby management, and the core gameplay loop.
 
-<img src="style_assets/navigation_chart.png" alt="Website Navigation Flowchart" width="100%">
+<img src="style-assets/navigation_chart.png" alt="Website Navigation Flowchart" width="100%">
 
 ---
 
@@ -56,7 +56,7 @@ The navigation diagram below illustrates the complete player journey through reg
 
 The relational database in **MySQL** manages user accounts, room instances, word pools, and temporary match states.
 
-<img src="style_assets/mysql_tables.png" alt="MySQL Database Structure" width="100%">
+<img src="style-assets/mysql_tables.png" alt="MySQL Database Structure" width="100%">
 
 ---
 
